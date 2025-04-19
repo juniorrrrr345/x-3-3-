@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Ajouter un Produit</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+
+    form {
+      max-width: 500px;
+      margin: auto;
+    }
+
+    label {
+      display: block;
+      margin: 12px 0 6px;
+    }
+
+    input[type="text"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      background-color: #2b7bb9;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #1a5e8a;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Ajouter un Produit</h2>
+  <form id="productForm">
+    <label for="category">Catégorie :</label>
+    <input type="text" id="category" name="category" required>
+
+    <label for="title">Titre :</label>
+    <input type="text" id="title" name="title" required>
+
+    <label for="prices">Prix :</label>
+    <input type="text" id="prices" name="prices" required>
+
+    <label for="description">Description :</label>
+    <textarea id="description" name="description" rows="5" required></textarea>
+
+    <label for="imageInput">Image (optionnelle) :</label>
+    <input type="file" id="imageInput" name="imageInput" accept="image/*">
+
+    <button type="submit">Envoyer sur Telegram</button>
+  </form>
+
+  <script>
+    const TELEGRAM_BOT_TOKEN = "TON_BOT_TOKEN_ICI"; // Remplacez par votre token
+    const TELEGRAM_CHAT_ID = "@ton_channel_ou_ID";  // Remplacez par votre @channel ou ID
+
+    document.getElementById("productForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const title = document.getElementById("title").value.trim();
+      const category = document.getElementById("category").value.trim();
+      const prices = document.getElementById("prices").value.trim();
+      const description = document.getElementById("description").value.trim();
+      const imageFile = document.getElementById("imageInput").files[0];
+
+      const caption = `*${category}*\n\n*${title}*\n\n${prices}\n\n${description}`;
+
+      const formData = new FormData();
+      formData.append("chat_id", TELEGRAM_CHAT_ID);
+      formData.append("parse_mode", "Markdown");
+
+      try {
+        let response;
+
+        if (imageFile) {
+          formData.append("caption", caption);
+          formData.append("photo", imageFile);
+          response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`, {
+            method: "POST",
+            body: formData,
+          });
+        } else {
+          formData.append("text", caption);
+          response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+            method: "POST",
+            body: formData,
+          });
+        }
+
+        const result = await response.json();
+
+        if (response.ok && result.ok) {
+          alert("✅ Produit ajouté et envoyé sur Telegram !");
+          document.getElementById("productForm").reset();
+        } else {
+          throw new Error(result.description || "Une erreur est survenue.");
+        }
+      } catch (error) {
+        alert("❌ Erreur lors de l'envoi sur Telegram : " + error.message);
+        console.error("Telegram API Error:", error);
+      }
+    });
+  </script>
+
+</body>
+</html>
