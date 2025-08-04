@@ -42,46 +42,14 @@
                 </div>
             </div>
 
-            <!-- Section Vidéos -->
-            <div class="videos-section">
-                <h2 class="videos-title">📹 VIDÉOS DU PRODUIT</h2>
-                <div class="videos-grid">
-                    <div class="video-item">
-                        <video controls poster="https://images.unsplash.com/photo-1597075388115-e59de916bdcc?w=300&h=500&fit=crop">
-                            <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
-                            Votre navigateur ne supporte pas la vidéo.
-                        </video>
-                        <div class="video-overlay">
-                            Vue détaillée
-                        </div>
-                    </div>
-                    <div class="video-item">
-                        <video controls poster="https://images.unsplash.com/photo-1598911543663-37d77962beb1?w=300&h=500&fit=crop">
-                            <source src="https://www.w3schools.com/html/movie.mp4" type="video/mp4">
-                            Votre navigateur ne supporte pas la vidéo.
-                        </video>
-                        <div class="video-overlay">
-                            Texture close-up
-                        </div>
-                    </div>
-                    <div class="video-item">
-                        <video controls poster="https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=300&h=500&fit=crop">
-                            <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
-                            Votre navigateur ne supporte pas la vidéo.
-                        </video>
-                        <div class="video-overlay">
-                            Qualité premium
-                        </div>
-                    </div>
-                    <div class="video-item">
-                        <video controls poster="https://images.unsplash.com/photo-1616690710400-a16d146927c5?w=300&h=500&fit=crop">
-                            <source src="https://www.w3schools.com/html/movie.mp4" type="video/mp4">
-                            Votre navigateur ne supporte pas la vidéo.
-                        </video>
-                        <div class="video-overlay">
-                            Fresh pressed
-                        </div>
-                    </div>
+            <!-- Section Vidéo unique -->
+            <div class="video-section">
+                <h2 class="video-title">📹 VIDÉO DU PRODUIT</h2>
+                <div class="video-container">
+                    <video controls poster="https://images.unsplash.com/photo-1597075388115-e59de916bdcc?w=600&h=800&fit=crop" id="productVideo">
+                        <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+                        Votre navigateur ne supporte pas la vidéo.
+                    </video>
                 </div>
             </div>
 
@@ -144,5 +112,25 @@
     </nav>
 
     <script src="app.js"></script>
+    <script>
+        // Prêt pour MongoDB et Cloudinary
+        // Cette section sera mise à jour avec vos credentials
+        
+        // Exemple de structure pour récupérer les données depuis MongoDB
+        async function loadProductData() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('product');
+            
+            // TODO: Remplacer par votre API MongoDB
+            // const response = await fetch(`/api/products/${productId}`);
+            // const product = await response.json();
+            
+            // TODO: Charger la vidéo depuis Cloudinary
+            // document.getElementById('productVideo').src = product.videoUrl;
+        }
+        
+        // Charger les données au chargement de la page
+        // loadProductData();
+    </script>
 </body>
 </html>
