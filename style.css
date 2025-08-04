@@ -55,11 +55,13 @@ body {
     z-index: 10;
 }
 
-/* Grille de produits */
+/* Grille de produits - TOUJOURS 2 colonnes */
 .products-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
+    gap: 15px;
+    max-width: 800px;
+    margin: 0 auto;
 }
 
 /* Carte produit */
@@ -72,6 +74,9 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.1);
     transition: all 0.3s ease;
     cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    display: block;
 }
 
 .product-card:hover {
@@ -84,7 +89,7 @@ body {
 .product-image {
     position: relative;
     width: 100%;
-    height: 250px;
+    height: 200px;
     background: #111;
     overflow: hidden;
 }
@@ -98,13 +103,13 @@ body {
 /* Badge sur l'image */
 .product-badge {
     position: absolute;
-    top: 15px;
-    right: 15px;
+    top: 10px;
+    right: 10px;
     background: rgba(0, 0, 0, 0.8);
     color: white;
-    padding: 8px 15px;
+    padding: 6px 12px;
     border-radius: 20px;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 600;
     letter-spacing: 0.5px;
     backdrop-filter: blur(10px);
@@ -115,23 +120,143 @@ body {
 }
 
 .flag-emoji {
-    font-size: 14px;
+    font-size: 12px;
 }
 
 /* Info produit */
 .product-info {
-    padding: 20px;
+    padding: 15px;
 }
 
 .product-title {
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 600;
-    margin-bottom: 8px;
+    margin-bottom: 5px;
 }
 
 .product-subtitle {
-    font-size: 14px;
+    font-size: 13px;
     color: rgba(255, 255, 255, 0.6);
+}
+
+/* Page détail produit */
+.product-detail {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.detail-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.detail-title {
+    font-size: 32px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.detail-variants {
+    margin: 20px 0;
+}
+
+.variant-list {
+    list-style: none;
+    padding: 0;
+}
+
+.variant-list li {
+    padding: 8px 0;
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.variant-list li:before {
+    content: "• ";
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.detail-badges {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 20px 0;
+}
+
+.detail-badge {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.detail-description {
+    text-align: center;
+    margin: 30px 0;
+    font-size: 16px;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.price-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin: 30px 0;
+}
+
+.price-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.price-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateY(-2px);
+}
+
+.price-quantity {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.price-amount {
+    font-size: 20px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.order-button {
+    display: block;
+    width: 100%;
+    max-width: 400px;
+    margin: 40px auto;
+    padding: 18px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50px;
+    color: white;
+    font-size: 18px;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.order-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(255, 255, 255, 0.2);
 }
 
 /* Navigation du bas */
@@ -326,15 +451,15 @@ body {
     }
     
     .product-image {
-        height: 220px;
+        height: 180px;
     }
 }
 
 /* Responsive Mobile */
 @media (max-width: 768px) {
+    /* GARDER 2 colonnes même sur mobile */
     .products-grid {
-        grid-template-columns: 1fr;
-        gap: 15px;
+        gap: 10px;
     }
     
     .container {
@@ -342,7 +467,7 @@ body {
     }
     
     .product-image {
-        height: 200px;
+        height: 150px;
     }
     
     .logo-overlay img {
@@ -366,6 +491,32 @@ body {
     .page-title {
         font-size: 28px;
     }
+    
+    .product-title {
+        font-size: 16px;
+    }
+    
+    .product-subtitle {
+        font-size: 12px;
+    }
+    
+    .product-badge {
+        font-size: 9px;
+        padding: 5px 10px;
+    }
+    
+    .price-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    
+    .price-quantity {
+        font-size: 20px;
+    }
+    
+    .price-amount {
+        font-size: 18px;
+    }
 }
 
 /* Très petits écrans */
@@ -379,11 +530,15 @@ body {
     }
     
     .product-title {
-        font-size: 18px;
+        font-size: 14px;
     }
     
     .product-badge {
-        font-size: 10px;
-        padding: 6px 12px;
+        font-size: 8px;
+        padding: 4px 8px;
+    }
+    
+    .product-image {
+        height: 120px;
     }
 }

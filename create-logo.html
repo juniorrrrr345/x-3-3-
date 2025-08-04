@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Créer Logo PNG</title>
+</head>
+<body style="background: #000; color: #fff; font-family: Arial;">
+    <h1>Logo PNG de test</h1>
+    <p>Faites un clic droit sur l'image et "Enregistrer sous" → logo.png</p>
+    
+    <canvas id="canvas" width="300" height="300"></canvas>
+    
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Fond transparent
+        ctx.clearRect(0, 0, 300, 300);
+        
+        // Cercle principal
+        ctx.beginPath();
+        ctx.arc(150, 150, 100, 0, 2 * Math.PI);
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        
+        // Texte
+        ctx.font = 'bold 48px Arial';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('LOGO', 150, 150);
+        
+        // Convertir en PNG
+        canvas.toBlob(function(blob) {
+            const url = URL.createObjectURL(blob);
+            const img = document.createElement('img');
+            img.src = url;
+            img.style.border = '1px solid #333';
+            img.style.marginTop = '20px';
+            img.style.display = 'block';
+            document.body.appendChild(img);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'logo.png';
+            link.textContent = 'Télécharger logo.png';
+            link.style.display = 'block';
+            link.style.marginTop = '20px';
+            link.style.color = '#4a9eff';
+            document.body.appendChild(link);
+        });
+    </script>
+</body>
+</html>
