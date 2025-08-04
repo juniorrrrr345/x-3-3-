@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact - Boutique Premium</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Effet de flou -->
+    <div class="blur-background"></div>
+    
+    <!-- Logo transparent -->
+    <div class="logo-overlay">
+        <img src="logo.png" alt="Logo" id="logoImg">
+    </div>
+
+    <!-- Contenu -->
+    <div class="container">
+        <h1 class="page-title">CONTACTEZ-NOUS</h1>
+        
+        <form class="contact-form">
+            <div class="form-group">
+                <label for="name">Nom</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="subject">Sujet</label>
+                <input type="text" id="subject" name="subject" required>
+            </div>
+
+            <div class="form-group">
+                <label for="message">Message</label>
+                <textarea id="message" name="message" rows="5" required></textarea>
+            </div>
+
+            <button type="submit" class="submit-btn">Envoyer</button>
+        </form>
+
+        <div class="info-section" style="margin-top: 40px; text-align: center;">
+            <h2>📧 Contact Direct</h2>
+            <p>contact@boutique-premium.com<br>
+            Réponse sous 24h garantie</p>
+        </div>
+    </div>
+
+    <!-- Navigation du bas -->
+    <nav class="bottom-nav">
+        <div class="ios-bar"></div>
+        <div class="nav-container">
+            <a href="index.html" class="nav-item">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">Menu</span>
+            </a>
+            <a href="infos.html" class="nav-item">
+                <span class="nav-icon">ℹ️</span>
+                <span class="nav-label">Infos</span>
+            </a>
+            <a href="canal.html" class="nav-item">
+                <span class="nav-icon">📡</span>
+                <span class="nav-label">Canal</span>
+            </a>
+            <a href="contact.html" class="nav-item active">
+                <span class="nav-icon">✉️</span>
+                <span class="nav-label">Contact</span>
+            </a>
+        </div>
+    </nav>
+
+    <script src="app.js"></script>
+</body>
+</html>

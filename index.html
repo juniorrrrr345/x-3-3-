@@ -4,156 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Boutique Premium</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-            background-color: #000000;
-            color: #ffffff;
-            min-height: 100vh;
-        }
-
-        /* Logo transparent centré avec effet de flou */
-        .logo-overlay {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 1;
-            pointer-events: none;
-        }
-
-        .logo-overlay img {
-            width: 300px;
-            height: 300px;
-            opacity: 0.08; /* Très transparent comme sur votre image */
-            object-fit: contain;
-        }
-
-        /* Effet de flou derrière le logo */
-        .blur-background {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 350px;
-            height: 350px;
-            background: radial-gradient(circle at center, 
-                rgba(255, 255, 255, 0.05) 0%, 
-                transparent 60%);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-radius: 50%;
-            z-index: 0;
-        }
-
-        /* Container principal */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 40px 20px;
-            position: relative;
-            z-index: 10;
-        }
-
-        /* Grille de produits - 2 colonnes comme sur l'image */
-        .products-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-        }
-
-        /* Carte produit */
-        .product-card {
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 15px;
-            overflow: hidden;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .product-card:hover {
-            transform: translateY(-5px);
-            background: rgba(255, 255, 255, 0.06);
-            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
-        }
-
-        /* Image produit */
-        .product-image {
-            position: relative;
-            width: 100%;
-            height: 250px;
-            background: #111;
-            overflow: hidden;
-        }
-
-        .product-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        /* Badge sur l'image */
-        .product-badge {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        /* Info produit */
-        .product-info {
-            padding: 20px;
-        }
-
-        .product-title {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .product-subtitle {
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        /* Pour uploader votre logo */
-        .upload-zone {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 15px;
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            font-size: 12px;
-            z-index: 100;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .products-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <!-- Effet de flou -->
@@ -161,17 +12,16 @@
     
     <!-- Logo transparent -->
     <div class="logo-overlay">
-        <!-- REMPLACEZ logo.png PAR VOTRE LOGO -->
         <img src="logo.png" alt="Logo" id="logoImg">
     </div>
 
     <!-- Produits -->
     <div class="container">
         <div class="products-grid">
-            <!-- Produit 1 -->
+            <!-- CALIPLATES -->
             <div class="product-card">
                 <div class="product-image">
-                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='250'%3E%3Crect width='400' height='250' fill='%23222'/%3E%3C/svg%3E" alt="CALIPLATES">
+                    <img src="https://images.unsplash.com/photo-1544928147-79a2dbc1f389?w=400&h=250&fit=crop&q=80" alt="CALIPLATES">
                 </div>
                 <div class="product-info">
                     <h2 class="product-title">CALIPLATES</h2>
@@ -179,10 +29,10 @@
                 </div>
             </div>
 
-            <!-- Produit 2 -->
+            <!-- Sahas terps -->
             <div class="product-card">
                 <div class="product-image">
-                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='250'%3E%3Crect width='400' height='250' fill='%23333'/%3E%3C/svg%3E" alt="Sahas terps">
+                    <img src="https://images.unsplash.com/photo-1598911543663-37d77962beb1?w=400&h=250&fit=crop&q=80" alt="Sahas terps">
                 </div>
                 <div class="product-info">
                     <h2 class="product-title">Sahas terps</h2>
@@ -190,11 +40,13 @@
                 </div>
             </div>
 
-            <!-- Produit 3 -->
+            <!-- STATIC SIFT US -->
             <div class="product-card">
                 <div class="product-image">
-                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='250'%3E%3Crect width='400' height='250' fill='%23222'/%3E%3C/svg%3E" alt="Static Sift">
-                    <div class="product-badge">STATIC SIFT US 🇺🇸</div>
+                    <img src="https://images.unsplash.com/photo-1597075388115-e59de916bdcc?w=400&h=250&fit=crop&q=80" alt="Static Sift">
+                    <div class="product-badge">
+                        STATIC SIFT US <span class="flag-emoji">🇺🇸</span>
+                    </div>
                 </div>
                 <div class="product-info">
                     <h2 class="product-title">Sahas terps</h2>
@@ -202,11 +54,13 @@
                 </div>
             </div>
 
-            <!-- Produit 4 -->
+            <!-- DRY SIFT US -->
             <div class="product-card">
                 <div class="product-image">
-                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='250'%3E%3Crect width='400' height='250' fill='%23333'/%3E%3C/svg%3E" alt="Dry Sift">
-                    <div class="product-badge">DRY SIFT US 🇺🇸 10 SUR 10</div>
+                    <img src="https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=400&h=250&fit=crop&q=80" alt="Dry Sift">
+                    <div class="product-badge">
+                        DRY SIFT US <span class="flag-emoji">🇺🇸</span> 10 SUR 10
+                    </div>
                 </div>
                 <div class="product-info">
                     <h2 class="product-title">Sahas terps</h2>
@@ -214,11 +68,13 @@
                 </div>
             </div>
 
-            <!-- Produit 5 -->
+            <!-- US PREMIUM BATCH NOZU -->
             <div class="product-card">
                 <div class="product-image">
-                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='250'%3E%3Crect width='400' height='250' fill='%23222'/%3E%3C/svg%3E" alt="Batch Nozu">
-                    <div class="product-badge">US PREMIUM 🇺🇸 BATCH NOZU</div>
+                    <img src="https://images.unsplash.com/photo-1616690710400-a16d146927c5?w=400&h=250&fit=crop&q=80" alt="Batch Nozu">
+                    <div class="product-badge">
+                        US PREMIUM <span class="flag-emoji">🇺🇸</span> BATCH NOZU
+                    </div>
                 </div>
                 <div class="product-info">
                     <h2 class="product-title">Premium Collection</h2>
@@ -226,44 +82,72 @@
                 </div>
             </div>
 
-            <!-- Produit 6 -->
+            <!-- CALI US PREMIUM -->
             <div class="product-card">
                 <div class="product-image">
-                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='250'%3E%3Crect width='400' height='250' fill='%23333'/%3E%3C/svg%3E" alt="Cali Premium">
-                    <div class="product-badge">CALI US 🇺🇸 PREMIUM</div>
+                    <img src="https://images.unsplash.com/photo-1536819114556-1e10f967fb61?w=400&h=250&fit=crop&q=80" alt="Cali Premium">
+                    <div class="product-badge">
+                        CALI US <span class="flag-emoji">🇺🇸</span> PREMIUM
+                    </div>
                 </div>
                 <div class="product-info">
                     <h2 class="product-title">The Premium Series</h2>
                     <p class="product-subtitle">Collection exclusive</p>
                 </div>
             </div>
+
+            <!-- Produits supplémentaires -->
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="https://images.unsplash.com/photo-1556928045-16f7f50be0f3?w=400&h=250&fit=crop&q=80" alt="Gold Edition">
+                    <div class="product-badge">
+                        GOLD EDITION <span class="flag-emoji">🇺🇸</span>
+                    </div>
+                </div>
+                <div class="product-info">
+                    <h2 class="product-title">Gold Premium</h2>
+                    <p class="product-subtitle">Ultra rare</p>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="https://images.unsplash.com/photo-1598662779094-110c2bad80b5?w=400&h=250&fit=crop&q=80" alt="Diamond Cut">
+                    <div class="product-badge">
+                        DIAMOND CUT <span class="flag-emoji">🇺🇸</span>
+                    </div>
+                </div>
+                <div class="product-info">
+                    <h2 class="product-title">Diamond Series</h2>
+                    <p class="product-subtitle">Top shelf quality</p>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Zone d'upload -->
-    <div class="upload-zone">
-        <strong>Pour ajouter votre logo PNG :</strong><br>
-        1. Créez un fichier "logo.png"<br>
-        2. Uploadez-le dans le projet<br>
-        3. Il apparaîtra automatiquement
-    </div>
+    <!-- Navigation du bas -->
+    <nav class="bottom-nav">
+        <div class="ios-bar"></div>
+        <div class="nav-container">
+            <a href="index.html" class="nav-item active">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">Menu</span>
+            </a>
+            <a href="infos.html" class="nav-item">
+                <span class="nav-icon">ℹ️</span>
+                <span class="nav-label">Infos</span>
+            </a>
+            <a href="canal.html" class="nav-item">
+                <span class="nav-icon">📡</span>
+                <span class="nav-label">Canal</span>
+            </a>
+            <a href="contact.html" class="nav-item">
+                <span class="nav-icon">✉️</span>
+                <span class="nav-label">Contact</span>
+            </a>
+        </div>
+    </nav>
 
-    <script>
-        // Gestion du logo
-        document.getElementById('logoImg').onerror = function() {
-            // Si le logo n'existe pas, afficher un placeholder
-            this.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="300"%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" fill="white" font-size="40" opacity="0.3"%3ELOGO%3C/text%3E%3C/svg%3E';
-        };
-
-        // Animation au survol des cartes
-        document.querySelectorAll('.product-card').forEach(card => {
-            card.addEventListener('click', function() {
-                this.style.transform = 'scale(0.98)';
-                setTimeout(() => {
-                    this.style.transform = '';
-                }, 150);
-            });
-        });
-    </script>
+    <script src="app.js"></script>
 </body>
 </html>
