@@ -1,0 +1,23 @@
+{
+  "name": "cali-rabbit-boutique",
+  "version": "1.0.0",
+  "description": "Boutique premium Cali Rabbit avec effet de logo transparent et flou",
+  "main": "index.html",
+  "scripts": {
+    "dev": "npx serve .",
+    "build": "echo 'No build required for static site'",
+    "deploy": "vercel --prod"
+  },
+  "keywords": [
+    "boutique",
+    "cali",
+    "rabbit",
+    "premium",
+    "glassmorphism"
+  ],
+  "author": "Cali Rabbit",
+  "license": "MIT",
+  "devDependencies": {
+    "serve": "^14.2.0"
+  }
+}
