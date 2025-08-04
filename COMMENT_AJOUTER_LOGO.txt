@@ -1,0 +1,24 @@
+COMMENT AJOUTER VOTRE LOGO PNG TRANSPARENT
+==========================================
+
+1. PRÉPAREZ VOTRE LOGO
+   - Format : PNG avec fond transparent
+   - Taille recommandée : 300x300px minimum
+   - Nom du fichier : logo.png
+
+2. UPLOADEZ LE FICHIER
+   - Placez logo.png à la racine du projet (même niveau que index.html)
+
+3. C'EST TOUT !
+   - Le logo apparaîtra automatiquement au centre
+   - Il sera très transparent (8% d'opacité)
+   - Un effet de flou sera appliqué derrière
+
+POUR AJUSTER LA TRANSPARENCE :
+- Dans index.html, ligne 32, changez "opacity: 0.08" 
+- 0.05 = très transparent
+- 0.10 = un peu plus visible
+- 0.20 = plus visible
+
+POUR AJUSTER LA TAILLE :
+- Dans index.html, lignes 30-31, changez width et height
