@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Générateur de Logo Cali Style</title>
+</head>
+<body style="background: #000; color: #fff; font-family: Arial; padding: 20px;">
+    <h1>Générateur de Logo PNG Transparent</h1>
+    <p>Cliquez sur "Télécharger" pour obtenir votre logo.png</p>
+    
+    <canvas id="canvas" width="400" height="400" style="border: 1px solid #333; display: block; margin: 20px 0;"></canvas>
+    
+    <button id="download" style="padding: 10px 20px; font-size: 16px; cursor: pointer;">Télécharger logo.png</button>
+    
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Fond transparent
+        ctx.clearRect(0, 0, 400, 400);
+        
+        // Style Cali Rabbit
+        ctx.save();
+        
+        // Cercle principal avec gradient
+        const gradient = ctx.createRadialGradient(200, 200, 0, 200, 200, 150);
+        gradient.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
+        gradient.addColorStop(1, 'rgba(255, 255, 255, 0.6)');
+        
+        ctx.beginPath();
+        ctx.arc(200, 200, 150, 0, 2 * Math.PI);
+        ctx.strokeStyle = gradient;
+        ctx.lineWidth = 4;
+        ctx.stroke();
+        
+        // Oreilles de lapin stylisées
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+        ctx.lineWidth = 3;
+        
+        // Oreille gauche
+        ctx.beginPath();
+        ctx.ellipse(150, 120, 25, 60, -Math.PI/6, 0, 2 * Math.PI);
+        ctx.stroke();
+        
+        // Oreille droite
+        ctx.beginPath();
+        ctx.ellipse(250, 120, 25, 60, Math.PI/6, 0, 2 * Math.PI);
+        ctx.stroke();
+        
+        // Tête de lapin
+        ctx.beginPath();
+        ctx.arc(200, 200, 80, 0, 2 * Math.PI);
+        ctx.stroke();
+        
+        // Yeux
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+        ctx.beginPath();
+        ctx.arc(170, 190, 8, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(230, 190, 8, 0, 2 * Math.PI);
+        ctx.fill();
+        
+        // Texte CALI
+        ctx.font = 'bold 48px Arial';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('CALI', 200, 280);
+        
+        // Feuille de cannabis stylisée
+        ctx.strokeStyle = 'rgba(0, 255, 0, 0.7)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(200, 50);
+        ctx.lineTo(190, 70);
+        ctx.lineTo(200, 65);
+        ctx.lineTo(210, 70);
+        ctx.lineTo(200, 50);
+        ctx.stroke();
+        
+        ctx.restore();
+        
+        // Fonction de téléchargement
+        document.getElementById('download').addEventListener('click', function() {
+            canvas.toBlob(function(blob) {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'logo.png';
+                a.click();
+                URL.revokeObjectURL(url);
+            });
+        });
+    </script>
+    
+    <div style="margin-top: 40px;">
+        <h2>Instructions :</h2>
+        <ol>
+            <li>Cliquez sur "Télécharger logo.png"</li>
+            <li>Placez le fichier à la racine de votre projet</li>
+            <li>Le logo apparaîtra automatiquement sur toutes les pages</li>
+            <li>Il sera visible en haut (header) et en transparence au centre</li>
+        </ol>
+    </div>
+</body>
+</html>

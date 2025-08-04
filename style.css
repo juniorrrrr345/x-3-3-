@@ -10,6 +10,35 @@ body {
     color: #ffffff;
     min-height: 100vh;
     padding-bottom: 80px;
+    padding-top: 80px; /* Pour le header */
+}
+
+/* Header avec logo */
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 1000;
+    padding: 15px 20px;
+}
+
+.header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.header-logo {
+    height: 50px;
+    width: auto;
+    opacity: 0.9;
 }
 
 /* Logo transparent centré avec effet de flou */
@@ -155,6 +184,50 @@ body {
     font-size: 32px;
     font-weight: 600;
     margin-bottom: 10px;
+}
+
+/* Section vidéos */
+.videos-section {
+    margin: 40px 0;
+}
+
+.videos-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.videos-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.video-item {
+    position: relative;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    overflow: hidden;
+    aspect-ratio: 9/16;
+}
+
+.video-item video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.video-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
+    padding: 15px;
+    color: white;
+    font-size: 12px;
 }
 
 .detail-variants {
@@ -457,6 +530,18 @@ body {
 
 /* Responsive Mobile */
 @media (max-width: 768px) {
+    body {
+        padding-top: 70px;
+    }
+    
+    .header {
+        padding: 10px 15px;
+    }
+    
+    .header-logo {
+        height: 40px;
+    }
+    
     /* GARDER 2 colonnes même sur mobile */
     .products-grid {
         gap: 10px;
@@ -517,6 +602,14 @@ body {
     .price-amount {
         font-size: 18px;
     }
+    
+    .videos-grid {
+        gap: 10px;
+    }
+    
+    .detail-title {
+        font-size: 26px;
+    }
 }
 
 /* Très petits écrans */
@@ -540,5 +633,9 @@ body {
     
     .product-image {
         height: 120px;
+    }
+    
+    .header-logo {
+        height: 35px;
     }
 }
