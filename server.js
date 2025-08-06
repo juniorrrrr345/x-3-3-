@@ -29,7 +29,7 @@ app.use(session({
 }));
 
 // Fichier pour stocker les données
-const DATA_FILE = 'site-data.json';
+const DATA_FILE = path.join(process.cwd(), 'site-data.json');
 
 // Initialiser les données par défaut
 async function initializeData() {
@@ -56,6 +56,7 @@ async function readData() {
         const data = await fs.readFile(DATA_FILE, 'utf8');
         return JSON.parse(data);
     } catch {
+        await initializeData();
         return { contactContent: {}, products: [] };
     }
 }
@@ -162,11 +163,17 @@ app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, 'admin.html'));
 });
 
-// Initialiser et démarrer le serveur
-initializeData().then(() => {
+// Initialiser les données au démarrage
+initializeData();
+
+// Pour le développement local
+if (process.env.NODE_ENV !== 'production') {
     app.listen(PORT, () => {
         console.log(`Serveur démarré sur http://localhost:${PORT}`);
         console.log(`Panel admin accessible sur http://localhost:${PORT}/admin`);
         console.log(`Mot de passe admin: JuniorAdmin123`);
     });
-});
+}
+
+// Exporter l'app pour Vercel
+module.exports = app;
