@@ -1,5 +1,6 @@
 // État de l'application
 let isAuthenticated = false;
+let siteSettings = {};
 let contactContent = {};
 let products = [];
 
@@ -7,6 +8,7 @@ let products = [];
 const loginContainer = document.getElementById('loginContainer');
 const adminContainer = document.getElementById('adminContainer');
 const loginForm = document.getElementById('loginForm');
+const siteForm = document.getElementById('siteForm');
 const contactForm = document.getElementById('contactForm');
 const productForm = document.getElementById('productForm');
 const productModal = document.getElementById('productModal');
@@ -21,6 +23,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (data.isAdmin) {
         showAdminPanel();
     }
+
+    // Gérer les radio buttons pour le type de titre
+    document.getElementById('useTextTitle').addEventListener('change', handleTitleTypeChange);
+    document.getElementById('useLogoTitle').addEventListener('change', handleTitleTypeChange);
+    
+    // Gérer l'aperçu en temps réel
+    document.getElementById('siteTitle').addEventListener('input', updatePreview);
+    document.getElementById('logoUrl').addEventListener('input', updatePreview);
 });
 
 // Gestion de la connexion
@@ -53,6 +63,7 @@ function showAdminPanel() {
     isAuthenticated = true;
     loginContainer.style.display = 'none';
     adminContainer.style.display = 'block';
+    loadSiteSettings();
     loadContactContent();
     loadProducts();
 }
@@ -82,6 +93,91 @@ function switchTab(tabName) {
         loadProducts();
     }
 }
+
+// Gérer le changement de type de titre
+function handleTitleTypeChange() {
+    const useText = document.getElementById('useTextTitle').checked;
+    document.getElementById('textTitleSection').style.display = useText ? 'block' : 'none';
+    document.getElementById('logoSection').style.display = useText ? 'none' : 'block';
+    updatePreview();
+}
+
+// Mettre à jour l'aperçu
+function updatePreview() {
+    const previewContent = document.getElementById('previewContent');
+    const useText = document.getElementById('useTextTitle').checked;
+    
+    if (useText) {
+        const title = document.getElementById('siteTitle').value || 'Boutique Premium';
+        previewContent.innerHTML = `
+            <h2 style="color: #1d1d1f; font-size: 24px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;">
+                ${title}
+            </h2>
+        `;
+    } else {
+        const logoUrl = document.getElementById('logoUrl').value;
+        if (logoUrl) {
+            previewContent.innerHTML = `
+                <img src="${logoUrl}" alt="Logo" class="preview-logo" style="max-width: 200px; max-height: 100px;">
+            `;
+        } else {
+            previewContent.innerHTML = '<p style="color: #6e6e73;">Entrez une URL pour voir l\'aperçu</p>';
+        }
+    }
+}
+
+// Charger les paramètres du site
+async function loadSiteSettings() {
+    try {
+        const response = await fetch('/api/site-settings');
+        siteSettings = await response.json();
+        
+        // Remplir le formulaire
+        if (siteSettings.useTextTitle) {
+            document.getElementById('useTextTitle').checked = true;
+            document.getElementById('useLogoTitle').checked = false;
+        } else {
+            document.getElementById('useTextTitle').checked = false;
+            document.getElementById('useLogoTitle').checked = true;
+        }
+        
+        document.getElementById('siteTitle').value = siteSettings.title || '';
+        document.getElementById('logoUrl').value = siteSettings.logoUrl || '';
+        
+        handleTitleTypeChange();
+        updatePreview();
+    } catch (error) {
+        showError('Erreur lors du chargement des paramètres');
+    }
+}
+
+// Sauvegarder les paramètres du site
+siteForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const useTextTitle = document.getElementById('useTextTitle').checked;
+    const updatedSettings = {
+        title: document.getElementById('siteTitle').value,
+        logoUrl: document.getElementById('logoUrl').value,
+        useTextTitle: useTextTitle
+    };
+    
+    try {
+        const response = await fetch('/api/admin/site-settings', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedSettings)
+        });
+        
+        if (response.ok) {
+            showSuccess('Paramètres mis à jour avec succès');
+        } else {
+            showError('Erreur lors de la mise à jour');
+        }
+    } catch (error) {
+        showError('Erreur de connexion au serveur');
+    }
+});
 
 // Charger le contenu de la page contact
 async function loadContactContent() {

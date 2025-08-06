@@ -36,6 +36,11 @@ async function initializeData() {
         await fs.access(DATA_FILE);
     } catch {
         const defaultData = {
+            siteSettings: {
+                title: "Boutique Premium",
+                logoUrl: "",
+                useTextTitle: true
+            },
             contactContent: {
                 title: "CONTACTEZ-NOUS",
                 mainText: "Bienvenue sur notre page de contact. N'hésitez pas à nous contacter pour toute question ou demande d'information.",
@@ -56,7 +61,7 @@ async function readData() {
         return JSON.parse(data);
     } catch {
         await initializeData();
-        return { contactContent: {}, products: [] };
+        return { siteSettings: {}, contactContent: {}, products: [] };
     }
 }
 
@@ -111,6 +116,20 @@ app.post('/api/admin/logout', (req, res) => {
 // Vérifier l'état de connexion
 app.get('/api/admin/check', (req, res) => {
     res.json({ isAdmin: !!req.session.isAdmin });
+});
+
+// API pour les paramètres du site
+app.get('/api/site-settings', async (req, res) => {
+    const data = await readData();
+    res.json(data.siteSettings || {});
+});
+
+// API pour mettre à jour les paramètres du site (admin seulement)
+app.put('/api/admin/site-settings', requireAuth, async (req, res) => {
+    const data = await readData();
+    data.siteSettings = { ...data.siteSettings, ...req.body };
+    await writeData(data);
+    res.json({ success: true, settings: data.siteSettings });
 });
 
 // API pour le contenu de la page contact
