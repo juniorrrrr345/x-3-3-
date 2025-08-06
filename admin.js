@@ -1,14 +1,13 @@
 // État de l'application
 let isAuthenticated = false;
-let siteSettings = {};
-let contactContent = {};
+let allSettings = {};
 let products = [];
 
 // Éléments DOM
 const loginContainer = document.getElementById('loginContainer');
 const adminContainer = document.getElementById('adminContainer');
 const loginForm = document.getElementById('loginForm');
-const siteForm = document.getElementById('siteForm');
+const socialForm = document.getElementById('socialForm');
 const contactForm = document.getElementById('contactForm');
 const productForm = document.getElementById('productForm');
 const productModal = document.getElementById('productModal');
@@ -28,10 +27,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('useTextTitle').addEventListener('change', handleTitleTypeChange);
     document.getElementById('useLogoTitle').addEventListener('change', handleTitleTypeChange);
     
-    // Gérer l'aperçu en temps réel
-    document.getElementById('siteTitle').addEventListener('input', updatePreview);
-    document.getElementById('logoUrl').addEventListener('input', updatePreview);
+    // Synchroniser les inputs de couleur
+    setupColorSync('backgroundColor', 'backgroundColorText');
+    setupColorSync('orderButtonBgColor', 'orderButtonBgColorText');
+    setupColorSync('orderButtonTextColor', 'orderButtonTextColorText');
 });
+
+// Synchroniser les inputs de couleur
+function setupColorSync(colorId, textId) {
+    const colorInput = document.getElementById(colorId);
+    const textInput = document.getElementById(textId);
+    
+    colorInput.addEventListener('change', () => {
+        textInput.value = colorInput.value;
+    });
+    
+    textInput.addEventListener('change', () => {
+        if (/^#[0-9A-F]{6}$/i.test(textInput.value)) {
+            colorInput.value = textInput.value;
+        }
+    });
+}
 
 // Gestion de la connexion
 loginForm.addEventListener('submit', async (e) => {
@@ -63,8 +79,7 @@ function showAdminPanel() {
     isAuthenticated = true;
     loginContainer.style.display = 'none';
     adminContainer.style.display = 'block';
-    loadSiteSettings();
-    loadContactContent();
+    loadAllSettings();
     loadProducts();
 }
 
@@ -99,78 +114,147 @@ function handleTitleTypeChange() {
     const useText = document.getElementById('useTextTitle').checked;
     document.getElementById('textTitleSection').style.display = useText ? 'block' : 'none';
     document.getElementById('logoSection').style.display = useText ? 'none' : 'block';
-    updatePreview();
 }
 
-// Mettre à jour l'aperçu
-function updatePreview() {
-    const previewContent = document.getElementById('previewContent');
-    const useText = document.getElementById('useTextTitle').checked;
-    
-    if (useText) {
-        const title = document.getElementById('siteTitle').value || 'Boutique Premium';
-        previewContent.innerHTML = `
-            <h2 style="color: #1d1d1f; font-size: 24px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;">
-                ${title}
-            </h2>
-        `;
-    } else {
-        const logoUrl = document.getElementById('logoUrl').value;
-        if (logoUrl) {
-            previewContent.innerHTML = `
-                <img src="${logoUrl}" alt="Logo" class="preview-logo" style="max-width: 200px; max-height: 100px;">
-            `;
-        } else {
-            previewContent.innerHTML = '<p style="color: #6e6e73;">Entrez une URL pour voir l\'aperçu</p>';
-        }
-    }
-}
-
-// Charger les paramètres du site
-async function loadSiteSettings() {
+// Charger tous les paramètres
+async function loadAllSettings() {
     try {
-        const response = await fetch('/api/site-settings');
-        siteSettings = await response.json();
+        const response = await fetch('/api/settings');
+        allSettings = await response.json();
         
-        // Remplir le formulaire
-        if (siteSettings.useTextTitle) {
-            document.getElementById('useTextTitle').checked = true;
-            document.getElementById('useLogoTitle').checked = false;
-        } else {
-            document.getElementById('useTextTitle').checked = false;
-            document.getElementById('useLogoTitle').checked = true;
+        // Charger les paramètres du site
+        if (allSettings.site) {
+            loadSiteSettings(allSettings.site);
         }
         
-        document.getElementById('siteTitle').value = siteSettings.title || '';
-        document.getElementById('logoUrl').value = siteSettings.logoUrl || '';
+        // Charger les réseaux sociaux
+        if (allSettings.social) {
+            loadSocialSettings(allSettings.social);
+        }
         
-        handleTitleTypeChange();
-        updatePreview();
+        // Charger le contenu contact
+        if (allSettings.contact) {
+            loadContactContent(allSettings.contact);
+        }
+        
+        // Charger le bouton commander
+        if (allSettings.orderButton) {
+            loadOrderButtonSettings(allSettings.orderButton);
+        }
     } catch (error) {
         showError('Erreur lors du chargement des paramètres');
     }
 }
 
-// Sauvegarder les paramètres du site
-siteForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
+// Charger les paramètres du site
+function loadSiteSettings(siteSettings) {
+    if (siteSettings.useTextTitle) {
+        document.getElementById('useTextTitle').checked = true;
+        document.getElementById('useLogoTitle').checked = false;
+    } else {
+        document.getElementById('useTextTitle').checked = false;
+        document.getElementById('useLogoTitle').checked = true;
+    }
     
+    document.getElementById('siteTitle').value = siteSettings.title || '';
+    document.getElementById('logoUrl').value = siteSettings.logoUrl || '';
+    document.getElementById('backgroundImage').value = siteSettings.backgroundImage || '';
+    document.getElementById('backgroundColor').value = siteSettings.backgroundColor || '#000000';
+    document.getElementById('backgroundColorText').value = siteSettings.backgroundColor || '#000000';
+    
+    handleTitleTypeChange();
+}
+
+// Charger les paramètres des réseaux sociaux
+function loadSocialSettings(socialSettings) {
+    document.getElementById('telegramLink').value = socialSettings.telegram || '';
+    document.getElementById('whatsappLink').value = socialSettings.whatsapp || '';
+    document.getElementById('instagramLink').value = socialSettings.instagram || '';
+    document.getElementById('snapchatLink').value = socialSettings.snapchat || '';
+}
+
+// Charger le contenu contact
+function loadContactContent(contactContent) {
+    document.getElementById('contactTitle').value = contactContent.title || '';
+    document.getElementById('contactMainText').value = contactContent.mainText || '';
+    document.getElementById('contactEmail').value = contactContent.email || '';
+    document.getElementById('contactResponseTime').value = contactContent.responseTime || '';
+    document.getElementById('contactAdditionalInfo').value = contactContent.additionalInfo || '';
+}
+
+// Charger les paramètres du bouton commander
+function loadOrderButtonSettings(buttonSettings) {
+    document.getElementById('orderButtonText').value = buttonSettings.text || 'Commander';
+    document.getElementById('orderButtonLink').value = buttonSettings.link || '';
+    document.getElementById('orderButtonBgColor').value = buttonSettings.backgroundColor || '#667eea';
+    document.getElementById('orderButtonBgColorText').value = buttonSettings.backgroundColor || '#667eea';
+    document.getElementById('orderButtonTextColor').value = buttonSettings.textColor || '#ffffff';
+    document.getElementById('orderButtonTextColorText').value = buttonSettings.textColor || '#ffffff';
+}
+
+// Sauvegarder tous les paramètres du site
+async function saveAllSiteSettings() {
     const useTextTitle = document.getElementById('useTextTitle').checked;
-    const updatedSettings = {
+    const siteSettings = {
         title: document.getElementById('siteTitle').value,
         logoUrl: document.getElementById('logoUrl').value,
-        useTextTitle: useTextTitle
+        useTextTitle: useTextTitle,
+        backgroundImage: document.getElementById('backgroundImage').value,
+        backgroundColor: document.getElementById('backgroundColor').value
+    };
+    
+    const orderButtonSettings = {
+        text: document.getElementById('orderButtonText').value,
+        link: document.getElementById('orderButtonLink').value,
+        backgroundColor: document.getElementById('orderButtonBgColor').value,
+        textColor: document.getElementById('orderButtonTextColor').value
     };
     
     try {
-        const response = await fetch('/api/admin/site-settings', {
+        // Sauvegarder les paramètres du site
+        const siteResponse = await fetch('/api/admin/site-settings', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(updatedSettings)
+            body: JSON.stringify(siteSettings)
+        });
+        
+        // Sauvegarder le bouton commander
+        const buttonResponse = await fetch('/api/admin/order-button', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(orderButtonSettings)
+        });
+        
+        if (siteResponse.ok && buttonResponse.ok) {
+            showSuccess('Paramètres d\'apparence mis à jour avec succès');
+        } else {
+            showError('Erreur lors de la mise à jour');
+        }
+    } catch (error) {
+        showError('Erreur de connexion au serveur');
+    }
+}
+
+// Sauvegarder les réseaux sociaux
+socialForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const socialSettings = {
+        telegram: document.getElementById('telegramLink').value,
+        whatsapp: document.getElementById('whatsappLink').value,
+        instagram: document.getElementById('instagramLink').value,
+        snapchat: document.getElementById('snapchatLink').value
+    };
+    
+    try {
+        const response = await fetch('/api/admin/social-settings', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(socialSettings)
         });
         
         if (response.ok) {
-            showSuccess('Paramètres mis à jour avec succès');
+            showSuccess('Réseaux sociaux mis à jour avec succès');
         } else {
             showError('Erreur lors de la mise à jour');
         }
@@ -178,23 +262,6 @@ siteForm.addEventListener('submit', async (e) => {
         showError('Erreur de connexion au serveur');
     }
 });
-
-// Charger le contenu de la page contact
-async function loadContactContent() {
-    try {
-        const response = await fetch('/api/contact-content');
-        contactContent = await response.json();
-        
-        // Remplir le formulaire
-        document.getElementById('contactTitle').value = contactContent.title || '';
-        document.getElementById('contactMainText').value = contactContent.mainText || '';
-        document.getElementById('contactEmail').value = contactContent.email || '';
-        document.getElementById('contactResponseTime').value = contactContent.responseTime || '';
-        document.getElementById('contactAdditionalInfo').value = contactContent.additionalInfo || '';
-    } catch (error) {
-        showError('Erreur lors du chargement du contenu');
-    }
-}
 
 // Sauvegarder le contenu de la page contact
 contactForm.addEventListener('submit', async (e) => {
@@ -252,8 +319,8 @@ function displayProducts() {
             <p class="product-price">${product.price}€</p>
             <p style="font-size: 14px; color: #6e6e73;">${product.category}</p>
             <div class="product-actions">
-                <button class="btn-small btn-edit" onclick="editProduct('${product.id}')">Modifier</button>
-                <button class="btn-small btn-delete" onclick="deleteProduct('${product.id}')">Supprimer</button>
+                <button class="btn-small btn-edit" onclick="editProduct('${product._id || product.id}')">Modifier</button>
+                <button class="btn-small btn-delete" onclick="deleteProduct('${product._id || product.id}')">Supprimer</button>
             </div>
         </div>
     `).join('');
@@ -265,9 +332,9 @@ function openProductModal(productId = null) {
     const form = document.getElementById('productForm');
     
     if (productId) {
-        const product = products.find(p => p.id === productId);
+        const product = products.find(p => (p._id || p.id) === productId);
         modalTitle.textContent = 'Modifier le produit';
-        document.getElementById('productId').value = product.id;
+        document.getElementById('productId').value = productId;
         document.getElementById('productName').value = product.name;
         document.getElementById('productPrice').value = product.price;
         document.getElementById('productImage').value = product.image;
