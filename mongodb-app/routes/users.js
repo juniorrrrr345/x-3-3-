@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/user');
+const { uploadAvatar } = require('../config/cloudinary');
 
 // Middleware pour initialiser le modèle User
 const initUserModel = (req, res, next) => {
@@ -153,6 +154,67 @@ router.delete('/:id', initUserModel, async (req, res) => {
         res.json({
             success: true,
             message: 'User deleted successfully'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
+// POST /api/users/:id/avatar - Uploader/Mettre à jour l'avatar d'un utilisateur
+router.post('/:id/avatar', initUserModel, uploadAvatar.single('avatar'), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({
+                success: false,
+                error: 'No file uploaded'
+            });
+        }
+
+        const avatarData = {
+            url: req.file.path,
+            publicId: req.file.filename
+        };
+
+        const result = await req.userModel.updateAvatar(req.params.id, avatarData);
+
+        if (result.matchedCount === 0) {
+            return res.status(404).json({
+                success: false,
+                error: 'User not found'
+            });
+        }
+
+        res.json({
+            success: true,
+            message: 'Avatar updated successfully',
+            data: avatarData
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
+// DELETE /api/users/:id/avatar - Supprimer l'avatar d'un utilisateur
+router.delete('/:id/avatar', initUserModel, async (req, res) => {
+    try {
+        const result = await req.userModel.removeAvatar(req.params.id);
+
+        if (result.modifiedCount === 0) {
+            return res.status(404).json({
+                success: false,
+                error: 'User not found or no avatar to remove'
+            });
+        }
+
+        res.json({
+            success: true,
+            message: 'Avatar removed successfully'
         });
     } catch (error) {
         res.status(500).json({

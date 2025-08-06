@@ -4,6 +4,7 @@ require('dotenv').config();
 
 const { connectToDatabase, closeDatabaseConnection } = require('./db/connection');
 const usersRouter = require('./routes/users');
+const uploadsRouter = require('./routes/uploads');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -16,11 +17,15 @@ app.use(express.urlencoded({ extended: true }));
 // Route de base
 app.get('/', (req, res) => {
     res.json({
-        message: 'MongoDB API Server',
+        message: 'MongoDB API Server with Cloudinary',
         version: '1.0.0',
         endpoints: {
             users: '/api/users',
+            uploads: '/api/uploads',
             health: '/health'
+        },
+        cloudinary: {
+            preset_info: '/api/uploads/preset-info'
         }
     });
 });
@@ -46,6 +51,7 @@ app.get('/health', async (req, res) => {
 
 // Routes API
 app.use('/api/users', usersRouter);
+app.use('/api/uploads', uploadsRouter);
 
 // Gestion des erreurs 404
 app.use((req, res) => {

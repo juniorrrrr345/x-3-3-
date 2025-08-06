@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Upload Cloudinary</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .upload-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 2px dashed #ddd;
+            border-radius: 5px;
+            text-align: center;
+        }
+        input[type="file"] {
+            margin: 10px 0;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            word-break: break-all;
+        }
+        .preview {
+            max-width: 300px;
+            margin: 20px auto;
+            display: block;
+        }
+        .info {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .error {
+            color: red;
+            margin: 10px 0;
+        }
+        .success {
+            color: green;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Test Upload Direct Cloudinary</h1>
+        
+        <div class="info">
+            <h3>Informations de configuration :</h3>
+            <p><strong>Cloud Name:</strong> dkluoavpv</p>
+            <p><strong>Upload Preset:</strong> ml_default</p>
+            <p><strong>Types acceptés:</strong> Images (jpg, png, gif, webp)</p>
+        </div>
+
+        <div class="upload-section">
+            <h2>Upload Direct (Frontend → Cloudinary)</h2>
+            <input type="file" id="fileInput" accept="image/*">
+            <br>
+            <button onclick="uploadDirect()" id="uploadBtn">Uploader vers Cloudinary</button>
+            <div id="status"></div>
+        </div>
+
+        <div id="result" class="result" style="display:none;">
+            <h3>Résultat :</h3>
+            <p><strong>URL:</strong> <a id="imageUrl" href="" target="_blank"></a></p>
+            <p><strong>Public ID:</strong> <span id="publicId"></span></p>
+            <p><strong>Format:</strong> <span id="format"></span></p>
+            <p><strong>Taille:</strong> <span id="size"></span> bytes</p>
+            <img id="preview" class="preview" style="display:none;">
+        </div>
+
+        <div class="upload-section">
+            <h2>Test API Backend</h2>
+            <button onclick="testBackendAPI()">Tester la connexion API</button>
+            <div id="apiResult"></div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration Cloudinary
+        const CLOUD_NAME = 'dkluoavpv';
+        const UPLOAD_PRESET = 'ml_default';
+        const UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`;
+
+        async function uploadDirect() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            const status = document.getElementById('status');
+            const uploadBtn = document.getElementById('uploadBtn');
+
+            if (!file) {
+                status.innerHTML = '<p class="error">Veuillez sélectionner un fichier</p>';
+                return;
+            }
+
+            // Vérifier le type de fichier
+            if (!file.type.startsWith('image/')) {
+                status.innerHTML = '<p class="error">Le fichier doit être une image</p>';
+                return;
+            }
+
+            status.innerHTML = '<p>Upload en cours...</p>';
+            uploadBtn.disabled = true;
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('upload_preset', UPLOAD_PRESET);
+            formData.append('tags', 'browser-upload');
+
+            try {
+                const response = await fetch(UPLOAD_URL, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    status.innerHTML = '<p class="success">Upload réussi !</p>';
+                    displayResult(data);
+                } else {
+                    status.innerHTML = `<p class="error">Erreur: ${data.error.message}</p>`;
+                }
+            } catch (error) {
+                status.innerHTML = `<p class="error">Erreur réseau: ${error.message}</p>`;
+            } finally {
+                uploadBtn.disabled = false;
+            }
+        }
+
+        function displayResult(data) {
+            const resultDiv = document.getElementById('result');
+            const imageUrl = document.getElementById('imageUrl');
+            const publicId = document.getElementById('publicId');
+            const format = document.getElementById('format');
+            const size = document.getElementById('size');
+            const preview = document.getElementById('preview');
+
+            imageUrl.href = data.secure_url;
+            imageUrl.textContent = data.secure_url;
+            publicId.textContent = data.public_id;
+            format.textContent = data.format;
+            size.textContent = data.bytes;
+
+            preview.src = data.secure_url;
+            preview.style.display = 'block';
+
+            resultDiv.style.display = 'block';
+        }
+
+        async function testBackendAPI() {
+            const apiResult = document.getElementById('apiResult');
+            apiResult.innerHTML = '<p>Test en cours...</p>';
+
+            try {
+                const response = await fetch('http://localhost:3000/api/uploads/preset-info');
+                const data = await response.json();
+
+                if (response.ok) {
+                    apiResult.innerHTML = `
+                        <p class="success">API Backend connectée !</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                } else {
+                    apiResult.innerHTML = '<p class="error">Erreur de connexion à l\'API</p>';
+                }
+            } catch (error) {
+                apiResult.innerHTML = `<p class="error">L'API backend n'est pas accessible. Assurez-vous que le serveur est démarré (npm run dev)</p>`;
+            }
+        }
+    </script>
+</body>
+</html>

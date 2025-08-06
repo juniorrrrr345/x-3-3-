@@ -1,4 +1,5 @@
 const { ObjectId } = require('mongodb');
+const { deleteImage } = require('../config/cloudinary');
 
 class User {
     constructor(db) {
@@ -10,6 +11,8 @@ class User {
         try {
             const result = await this.collection.insertOne({
                 ...userData,
+                avatar: userData.avatar || null,
+                avatarPublicId: userData.avatarPublicId || null,
                 createdAt: new Date(),
                 updatedAt: new Date()
             });
@@ -63,9 +66,75 @@ class User {
         }
     }
 
-    // Supprimer un utilisateur
+    // Mettre à jour l'avatar d'un utilisateur
+    async updateAvatar(id, avatarData) {
+        try {
+            // Récupérer l'utilisateur pour obtenir l'ancien avatar
+            const user = await this.findById(id);
+            
+            // Supprimer l'ancien avatar de Cloudinary si il existe
+            if (user && user.avatarPublicId) {
+                await deleteImage(user.avatarPublicId);
+            }
+
+            // Mettre à jour avec le nouvel avatar
+            const result = await this.collection.updateOne(
+                { _id: new ObjectId(id) },
+                { 
+                    $set: {
+                        avatar: avatarData.url,
+                        avatarPublicId: avatarData.publicId,
+                        updatedAt: new Date()
+                    }
+                }
+            );
+            return result;
+        } catch (error) {
+            throw new Error(`Error updating avatar: ${error.message}`);
+        }
+    }
+
+    // Supprimer l'avatar d'un utilisateur
+    async removeAvatar(id) {
+        try {
+            const user = await this.findById(id);
+            
+            if (user && user.avatarPublicId) {
+                // Supprimer de Cloudinary
+                await deleteImage(user.avatarPublicId);
+                
+                // Mettre à jour la base de données
+                const result = await this.collection.updateOne(
+                    { _id: new ObjectId(id) },
+                    { 
+                        $set: {
+                            avatar: null,
+                            avatarPublicId: null,
+                            updatedAt: new Date()
+                        }
+                    }
+                );
+                return result;
+            }
+            
+            return { modifiedCount: 0 };
+        } catch (error) {
+            throw new Error(`Error removing avatar: ${error.message}`);
+        }
+    }
+
+    // Supprimer un utilisateur (modifié pour supprimer aussi l'avatar)
     async delete(id) {
         try {
+            // Récupérer l'utilisateur pour obtenir l'avatar
+            const user = await this.findById(id);
+            
+            // Supprimer l'avatar de Cloudinary si il existe
+            if (user && user.avatarPublicId) {
+                await deleteImage(user.avatarPublicId);
+            }
+
+            // Supprimer l'utilisateur
             const result = await this.collection.deleteOne({ 
                 _id: new ObjectId(id) 
             });
