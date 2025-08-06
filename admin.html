@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Administrateur - Boutique Premium</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f7;
+            color: #1d1d1f;
+            line-height: 1.6;
+        }
+
+        /* Login Form */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-title {
+            font-size: 28px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 30px;
+            color: #1d1d1f;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #6e6e73;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #d2d2d7;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: #6e6e73;
+            margin-top: 10px;
+        }
+
+        .btn-danger {
+            background: #ff3b30;
+        }
+
+        /* Admin Panel */
+        .admin-container {
+            display: none;
+            min-height: 100vh;
+        }
+
+        .admin-header {
+            background: white;
+            padding: 20px 40px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .admin-title {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .logout-btn {
+            padding: 10px 20px;
+            background: #ff3b30;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .admin-content {
+            padding: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #1d1d1f;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .product-card {
+            background: #f5f5f7;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .product-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .product-price {
+            color: #667eea;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 14px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-edit {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #ff3b30;
+            color: white;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #6e6e73;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #d2d2d7;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            color: #6e6e73;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Form -->
+    <div class="login-container" id="loginContainer">
+        <div class="login-box">
+            <h1 class="login-title">🔐 Panel Administrateur</h1>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="password">Mot de passe</label>
+                    <input type="password" id="password" placeholder="Entrez le mot de passe" required>
+                </div>
+                <button type="submit" class="btn">Se connecter</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div class="admin-container" id="adminContainer">
+        <header class="admin-header">
+            <h1 class="admin-title">📊 Panel d'Administration</h1>
+            <button class="logout-btn" onclick="logout()">Déconnexion</button>
+        </header>
+
+        <div class="admin-content">
+            <div class="alert alert-success" id="successAlert"></div>
+            <div class="alert alert-error" id="errorAlert"></div>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('contact')">📝 Page Contact</button>
+                <button class="tab" onclick="switchTab('products')">🛍️ Produits</button>
+            </div>
+
+            <!-- Contact Content Tab -->
+            <div class="tab-content active" id="contactTab">
+                <div class="section">
+                    <h2 class="section-title">Modifier le contenu de la page Contact</h2>
+                    <form id="contactForm">
+                        <div class="form-group">
+                            <label for="contactTitle">Titre de la page</label>
+                            <input type="text" id="contactTitle" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="contactMainText">Texte principal</label>
+                            <textarea id="contactMainText" rows="5" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="contactEmail">Email de contact</label>
+                            <input type="email" id="contactEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="contactResponseTime">Temps de réponse</label>
+                            <input type="text" id="contactResponseTime" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="contactAdditionalInfo">Informations supplémentaires</label>
+                            <textarea id="contactAdditionalInfo" rows="3"></textarea>
+                        </div>
+                        <button type="submit" class="btn">Enregistrer les modifications</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Products Tab -->
+            <div class="tab-content" id="productsTab">
+                <div class="section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 class="section-title">Gestion des Produits</h2>
+                        <button class="btn" style="width: auto;" onclick="openProductModal()">+ Ajouter un produit</button>
+                    </div>
+                    <div class="product-grid" id="productGrid">
+                        <!-- Les produits seront chargés ici -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Modal -->
+    <div class="modal" id="productModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Ajouter un produit</h3>
+                <button class="close-modal" onclick="closeProductModal()">×</button>
+            </div>
+            <form id="productForm">
+                <input type="hidden" id="productId">
+                <div class="form-group">
+                    <label for="productName">Nom du produit</label>
+                    <input type="text" id="productName" required>
+                </div>
+                <div class="form-group">
+                    <label for="productPrice">Prix (€)</label>
+                    <input type="number" id="productPrice" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="productImage">URL de l'image</label>
+                    <input type="url" id="productImage" required>
+                </div>
+                <div class="form-group">
+                    <label for="productDescription">Description</label>
+                    <textarea id="productDescription" rows="4" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="productCategory">Catégorie</label>
+                    <input type="text" id="productCategory" required>
+                </div>
+                <button type="submit" class="btn">Enregistrer</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>

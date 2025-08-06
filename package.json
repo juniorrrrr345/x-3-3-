@@ -1,10 +1,11 @@
 {
   "name": "cali-rabbit-boutique",
   "version": "1.0.0",
-  "description": "Boutique premium Cali Rabbit avec effet de logo transparent et flou",
-  "main": "index.html",
+  "description": "Boutique premium Cali Rabbit avec panel administrateur",
+  "main": "server.js",
   "scripts": {
-    "dev": "npx serve .",
+    "start": "node server.js",
+    "dev": "node server.js",
     "build": "echo 'Static site ready'",
     "vercel-build": "echo 'No build needed for static files'"
   },
@@ -13,10 +14,17 @@
     "cali",
     "rabbit",
     "premium",
-    "glassmorphism"
+    "glassmorphism",
+    "admin"
   ],
   "author": "Cali Rabbit",
   "license": "MIT",
+  "dependencies": {
+    "express": "^4.21.2",
+    "express-session": "^1.18.1",
+    "body-parser": "^1.20.3",
+    "bcrypt": "^5.1.1"
+  },
   "devDependencies": {
     "serve": "^14.2.0"
   }
