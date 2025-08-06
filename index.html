@@ -269,6 +269,13 @@
                 ? products 
                 : products.filter(p => p.category === currentFilter);
             
+            console.log('Affichage des produits:', filteredProducts.length, 'produits');
+            
+            if (filteredProducts.length === 0) {
+                grid.innerHTML = '<p style="text-align: center; color: white; padding: 40px;">Aucun produit disponible</p>';
+                return;
+            }
+            
             grid.innerHTML = filteredProducts.map(product => `
                 <a href="product-detail.html?product=${product.id}" class="product-card">
                     <div class="product-image">
@@ -286,6 +293,11 @@
         async function loadProductsFromDB() {
             try {
                 const response = await fetch('/api/products');
+                
+                if (!response.ok) {
+                    throw new Error('Erreur lors du chargement des produits');
+                }
+                
                 const dbProducts = await response.json();
                 
                 if (dbProducts && dbProducts.length > 0) {
@@ -293,7 +305,7 @@
                     products.length = 0;
                     dbProducts.forEach(product => {
                         products.push({
-                            id: product._id,
+                            id: product._id || product.slug || product.name.toLowerCase().replace(/\s+/g, '-'),
                             name: product.name,
                             subtitle: product.description || 'Plusieurs variétés',
                             image: product.image,
@@ -301,9 +313,17 @@
                         });
                     });
                     displayProducts();
+                    console.log('Produits chargés depuis MongoDB:', products.length);
+                } else {
+                    console.log('Aucun produit dans la base de données, utilisation des produits par défaut');
                 }
             } catch (error) {
-                console.log('Utilisation des produits par défaut');
+                console.error('Erreur lors du chargement des produits:', error);
+                // Afficher un message d'erreur discret
+                const grid = document.getElementById('productsGrid');
+                if (products.length === 0) {
+                    grid.innerHTML = '<p style="text-align: center; color: white; padding: 40px;">Chargement des produits...</p>';
+                }
             }
         }
 
@@ -311,6 +331,8 @@
         document.addEventListener('DOMContentLoaded', () => {
             // Afficher tous les produits par défaut
             displayProducts();
+            
+            // Charger les produits depuis MongoDB
             loadProductsFromDB();
             
             // Marquer le bouton "Tout afficher" comme actif par défaut
