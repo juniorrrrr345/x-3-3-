@@ -54,16 +54,22 @@
         }
 
         .show-all-btn {
-            background: transparent;
+            background: rgba(255, 255, 255, 0.15);
             border: 1px solid rgba(255, 255, 255, 0.3);
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 14px;
-            padding: 8px 20px;
+            color: white;
+            font-size: 16px;
+            padding: 15px 30px;
         }
 
         .show-all-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.2);
             color: white;
+        }
+
+        .show-all-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: transparent;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
         }
 
         /* Responsive */
@@ -103,15 +109,18 @@
     <div class="container">
         <!-- Section des catégories -->
         <div class="categories-section">
+            <h2 style="text-align: center; color: white; margin-bottom: 20px; font-size: 24px; text-transform: uppercase; letter-spacing: 2px;">
+                Nos Produits
+            </h2>
             <div class="category-buttons">
+                <button class="category-btn show-all-btn active" onclick="filterProducts('all')">
+                    🛍️ Tous les produits
+                </button>
                 <button class="category-btn" onclick="filterProducts('categories')">
-                    🏷️ CATÉGORIES
+                    🏷️ Catégories
                 </button>
                 <button class="category-btn" onclick="filterProducts('farm')">
-                    🌱 FARM
-                </button>
-                <button class="category-btn show-all-btn" onclick="filterProducts('all')">
-                    Tout afficher
+                    🌱 Farm
                 </button>
             </div>
             
@@ -231,7 +240,14 @@
             document.querySelectorAll('.category-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
-            event.target.classList.add('active');
+            
+            // Trouver et activer le bon bouton
+            if (event && event.target) {
+                event.target.classList.add('active');
+            } else {
+                // Si appelé sans event (au chargement), activer le bouton "Tout afficher"
+                document.querySelector('.show-all-btn').classList.add('active');
+            }
             
             // Mettre à jour l'info de filtre
             const filterInfo = document.getElementById('filterInfo');
@@ -239,7 +255,7 @@
                 filterInfo.style.display = 'none';
             } else {
                 filterInfo.style.display = 'block';
-                filterInfo.textContent = `Affichage : ${category === 'categories' ? 'Catégories' : 'Farm'}`;
+                filterInfo.textContent = `Filtrage actif : ${category === 'categories' ? 'Catégories' : 'Farm'}`;
             }
             
             // Afficher les produits filtrés
@@ -293,8 +309,12 @@
 
         // Initialiser l'affichage
         document.addEventListener('DOMContentLoaded', () => {
+            // Afficher tous les produits par défaut
             displayProducts();
             loadProductsFromDB();
+            
+            // Marquer le bouton "Tout afficher" comme actif par défaut
+            document.querySelector('.show-all-btn').classList.add('active');
         });
     </script>
 </body>
