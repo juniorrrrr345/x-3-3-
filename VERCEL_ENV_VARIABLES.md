@@ -6,18 +6,27 @@ Copiez et ajoutez ces variables dans votre projet Vercel :
 
 ```
 MONGODB_URI=mongodb+srv://idffulloption:Junior30@cluster0.wdopvu5.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
-DB_NAME=myapp
+DB_NAME=boutique_x33
 PORT=3000
 NODE_ENV=production
 SESSION_SECRET=votre-secret-session-très-sécurisé-changez-moi-123456789
 
-# Variables Cloudinary (optionnelles si vous utilisez les uploads)
+# Variables Cloudinary
 CLOUDINARY_URL=cloudinary://725121745967616:Z8G5NzYUDTl__-lLZHwTEJ3WjpI@dkluoavpv
 CLOUDINARY_CLOUD_NAME=dkluoavpv
 CLOUDINARY_API_KEY=725121745967616
 CLOUDINARY_API_SECRET=Z8G5NzYUDTl__-lLZHwTEJ3WjpI
-CLOUDINARY_UPLOAD_PRESET=ml_default
+CLOUDINARY_UPLOAD_PRESET=boutique_x33
+CLOUDINARY_FOLDER_PREFIX=boutique_x33
 ```
+
+## Configuration spéciale pour éviter les conflits
+
+Cette configuration utilise :
+- **Base de données** : `boutique_x33` (au lieu de `myapp`)
+- **Dossiers Cloudinary** : Préfixés avec `boutique_x33/` pour séparer les images
+
+Cela garantit que cette boutique n'interfère pas avec votre autre boutique sur le même compte MongoDB et Cloudinary.
 
 ## Comment ajouter ces variables dans Vercel
 

@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 3000;
 
 // Configuration MongoDB
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://idffulloption:Junior30@cluster0.wdopvu5.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
-const DB_NAME = process.env.DB_NAME || 'myapp';
+const DB_NAME = process.env.DB_NAME || 'boutique_x33';
 
 // Hash du mot de passe admin (JuniorAdmin123)
 const ADMIN_PASSWORD_HASH = '$2b$10$YourHashHere'; // Temporaire, sera généré
