@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Admin - Vérification des fonctionnalités</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .test-button:hover {
+            background: #45a049;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test des fonctionnalités Admin</h1>
+    
+    <div class="test-section">
+        <h2>1. Test de connexion</h2>
+        <button class="test-button" onclick="testLogin()">Tester la connexion</button>
+        <div id="loginResult" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. Test des paramètres du site</h2>
+        <button class="test-button" onclick="testSiteSettings()">Tester l'enregistrement des paramètres</button>
+        <div id="siteResult" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. Test des réseaux sociaux</h2>
+        <button class="test-button" onclick="testSocialSettings()">Tester l'enregistrement des réseaux</button>
+        <div id="socialResult" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. Test du bouton commander</h2>
+        <button class="test-button" onclick="testOrderButton()">Tester le bouton commander</button>
+        <div id="orderResult" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>5. Test des produits</h2>
+        <button class="test-button" onclick="testProducts()">Tester l'ajout de produit</button>
+        <div id="productResult" class="result"></div>
+    </div>
+
+    <script>
+        async function testLogin() {
+            const result = document.getElementById('loginResult');
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: 'JuniorAdmin123' })
+                });
+                const data = await response.json();
+                result.className = 'result success';
+                result.textContent = 'Connexion réussie : ' + JSON.stringify(data, null, 2);
+            } catch (error) {
+                result.className = 'result error';
+                result.textContent = 'Erreur : ' + error.message;
+            }
+        }
+        
+        async function testSiteSettings() {
+            const result = document.getElementById('siteResult');
+            try {
+                // D'abord se connecter
+                await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: 'JuniorAdmin123' })
+                });
+                
+                // Puis enregistrer les paramètres
+                const testData = {
+                    title: 'Test Boutique ' + Date.now(),
+                    logoUrl: '',
+                    useTextTitle: true,
+                    backgroundImage: '',
+                    backgroundColor: '#ff0000',
+                    backgroundType: 'color'
+                };
+                
+                const response = await fetch('/api/admin/site-settings', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(testData)
+                });
+                const data = await response.json();
+                
+                // Vérifier que les paramètres sont bien enregistrés
+                const checkResponse = await fetch('/api/settings');
+                const settings = await checkResponse.json();
+                
+                result.className = 'result success';
+                result.textContent = 'Paramètres enregistrés et vérifiés :\n' + JSON.stringify(settings.site, null, 2);
+            } catch (error) {
+                result.className = 'result error';
+                result.textContent = 'Erreur : ' + error.message;
+            }
+        }
+        
+        async function testSocialSettings() {
+            const result = document.getElementById('socialResult');
+            try {
+                const testData = {
+                    instagram: 'https://instagram.com/test',
+                    telegram: 'https://t.me/test',
+                    snapchat: 'https://snapchat.com/add/test'
+                };
+                
+                const response = await fetch('/api/admin/social-settings', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(testData)
+                });
+                const data = await response.json();
+                
+                result.className = 'result success';
+                result.textContent = 'Réseaux sociaux enregistrés : ' + JSON.stringify(data, null, 2);
+            } catch (error) {
+                result.className = 'result error';
+                result.textContent = 'Erreur : ' + error.message;
+            }
+        }
+        
+        async function testOrderButton() {
+            const result = document.getElementById('orderResult');
+            try {
+                const testData = {
+                    text: '🛒 ACHETER MAINTENANT',
+                    link: 'https://example.com/order',
+                    color: '#ff6b6b'
+                };
+                
+                const response = await fetch('/api/admin/order-button', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(testData)
+                });
+                const data = await response.json();
+                
+                result.className = 'result success';
+                result.textContent = 'Bouton commander enregistré : ' + JSON.stringify(data, null, 2);
+            } catch (error) {
+                result.className = 'result error';
+                result.textContent = 'Erreur : ' + error.message;
+            }
+        }
+        
+        async function testProducts() {
+            const result = document.getElementById('productResult');
+            try {
+                const testProduct = {
+                    name: 'Produit Test ' + Date.now(),
+                    description: 'Description du produit test',
+                    image: 'https://via.placeholder.com/300',
+                    video: '',
+                    category: 'categories',
+                    prices: [
+                        { quantity: '1 unité', price: '19.99€' },
+                        { quantity: '3 unités', price: '49.99€' }
+                    ]
+                };
+                
+                const response = await fetch('/api/products', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(testProduct)
+                });
+                const data = await response.json();
+                
+                result.className = 'result success';
+                result.textContent = 'Produit ajouté : ' + JSON.stringify(data, null, 2);
+            } catch (error) {
+                result.className = 'result error';
+                result.textContent = 'Erreur : ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>

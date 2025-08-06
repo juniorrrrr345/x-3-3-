@@ -35,12 +35,14 @@ function applySiteSettings(siteSettings) {
     }
     
     // Fond de la boutique
-    if (siteSettings.backgroundImage) {
+    if (siteSettings.backgroundType === 'image' && siteSettings.backgroundImage) {
         document.body.style.backgroundImage = `url(${siteSettings.backgroundImage})`;
+        document.body.style.backgroundColor = '';
         document.body.style.backgroundSize = 'cover';
         document.body.style.backgroundPosition = 'center';
         document.body.style.backgroundAttachment = 'fixed';
-    } else if (siteSettings.backgroundColor) {
+    } else if (siteSettings.backgroundType === 'color' && siteSettings.backgroundColor) {
+        document.body.style.backgroundImage = '';
         document.body.style.backgroundColor = siteSettings.backgroundColor;
     }
 }
@@ -174,19 +176,29 @@ function applyOrderButtonSettings(buttonSettings) {
             if (button.tagName === 'A') {
                 button.href = buttonSettings.link;
             } else {
-                button.onclick = () => window.location.href = buttonSettings.link;
+                button.onclick = () => window.open(buttonSettings.link, '_blank');
             }
         }
         
-        if (buttonSettings.backgroundColor || buttonSettings.textColor) {
-            button.style.backgroundColor = buttonSettings.backgroundColor || '#667eea';
-            button.style.color = buttonSettings.textColor || '#ffffff';
+        if (buttonSettings.color) {
+            button.style.background = `linear-gradient(135deg, ${buttonSettings.color} 0%, ${adjustColor(buttonSettings.color, -20)} 100%)`;
+            button.style.color = '#ffffff';
             button.style.border = 'none';
-            button.style.padding = '12px 24px';
-            button.style.borderRadius = '8px';
+            button.style.padding = '15px 40px';
+            button.style.borderRadius = '50px';
             button.style.fontWeight = '600';
             button.style.cursor = 'pointer';
             button.style.transition = 'all 0.3s ease';
+            button.style.boxShadow = `0 5px 20px ${buttonSettings.color}40`;
         }
     });
+}
+
+// Fonction pour ajuster la couleur (assombrir/éclaircir)
+function adjustColor(color, amount) {
+    const num = parseInt(color.replace('#', ''), 16);
+    const r = Math.max(0, Math.min(255, (num >> 16) + amount));
+    const g = Math.max(0, Math.min(255, ((num >> 8) & 0x00FF) + amount));
+    const b = Math.max(0, Math.min(255, (num & 0x0000FF) + amount));
+    return '#' + ((r << 16) | (g << 8) | b).toString(16).padStart(6, '0');
 }

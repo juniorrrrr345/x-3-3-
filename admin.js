@@ -498,6 +498,7 @@ async function editProduct(productId) {
         document.getElementById('productDescription').value = product.description;
         document.getElementById('productImage').value = product.image;
         document.getElementById('productVideo').value = product.video || '';
+        document.getElementById('productCategory').value = product.category || 'categories';
         
         // Charger les prix
         const pricesList = document.getElementById('pricesList');
@@ -543,6 +544,7 @@ document.getElementById('productForm').addEventListener('submit', async (e) => {
         description: document.getElementById('productDescription').value,
         image: document.getElementById('productImage').value,
         video: document.getElementById('productVideo').value,
+        category: document.getElementById('productCategory').value,
         prices: prices
     };
     

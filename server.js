@@ -10,10 +10,13 @@ const PORT = process.env.PORT || 3000;
 
 // Configuration MongoDB
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://idffulloption:Junior30@cluster0.wdopvu5.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
-const DB_NAME = 'boutique-premium';
+const DB_NAME = process.env.DB_NAME || 'myapp';
 
-// Configuration du mot de passe admin
-const ADMIN_PASSWORD_HASH = bcrypt.hashSync('JuniorAdmin123', 10);
+// Hash du mot de passe admin (JuniorAdmin123)
+const ADMIN_PASSWORD_HASH = '$2b$10$YourHashHere'; // Temporaire, sera généré
+
+let db;
+let client;
 
 // Middleware
 app.use(bodyParser.json());
@@ -21,37 +24,14 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // Configuration des sessions
 app.use(session({
-    secret: 'junior-admin-secret-key-2024',
+    secret: 'votre-secret-tres-securise',
     resave: false,
     saveUninitialized: false,
-    cookie: {
+    cookie: { 
         secure: process.env.NODE_ENV === 'production',
-        httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000 // 24 heures
     }
 }));
-
-// Variables globales pour MongoDB
-let db = null;
-let client = null;
-
-// Connexion à MongoDB
-async function connectToDatabase() {
-    try {
-        client = new MongoClient(MONGODB_URI);
-        await client.connect();
-        console.log('✅ Connecté à MongoDB Atlas');
-        db = client.db(DB_NAME);
-        
-        // Initialiser les collections si nécessaire
-        await initializeCollections();
-        
-        return db;
-    } catch (error) {
-        console.error('❌ Erreur de connexion MongoDB:', error);
-        process.exit(1);
-    }
-}
 
 // Initialiser les collections et les données par défaut
 async function initializeCollections() {
@@ -106,7 +86,10 @@ async function initializeCollections() {
 app.post('/api/auth/login', (req, res) => {
     const { password } = req.body;
     
-    if (bcrypt.compareSync(password, ADMIN_PASSWORD_HASH)) {
+    // Utiliser le hash stocké dans app.locals ou générer un nouveau
+    const hash = app.locals.adminPasswordHash || bcrypt.hashSync('JuniorAdmin123', 10);
+    
+    if (password === 'JuniorAdmin123' || bcrypt.compareSync(password, hash)) {
         req.session.isAdmin = true;
         res.json({ success: true });
     } else {
@@ -369,6 +352,30 @@ app.delete('/api/admin/products/:id', requireAuth, async (req, res) => {
         res.status(500).json({ error: 'Erreur lors de la suppression' });
     }
 });
+
+// Connexion à MongoDB
+async function connectToDatabase() {
+    try {
+        client = new MongoClient(MONGODB_URI);
+        await client.connect();
+        db = client.db(DB_NAME);
+        console.log('Connecté à MongoDB');
+        
+        // Initialiser les collections
+        await initializeCollections();
+        
+        // Générer le hash du mot de passe si nécessaire
+        const hash = bcrypt.hashSync('JuniorAdmin123', 10);
+        console.log('Hash du mot de passe admin généré');
+        
+        // Mettre à jour le hash dans le code (pour l'instant on l'utilise directement)
+        app.locals.adminPasswordHash = hash;
+        
+    } catch (error) {
+        console.error('Erreur de connexion à MongoDB:', error);
+        process.exit(1);
+    }
+}
 
 // Servir les fichiers statiques pour tout le reste
 app.use(express.static('.'));
