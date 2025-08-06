@@ -14,7 +14,6 @@ const ADMIN_PASSWORD_HASH = bcrypt.hashSync('JuniorAdmin123', 10);
 // Middleware
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static('.'));
 
 // Configuration des sessions
 app.use(session({
@@ -74,6 +73,17 @@ function requireAuth(req, res, next) {
     next();
 }
 
+// Route pour servir le panel admin
+app.get('/admin', (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin.html'));
+});
+
+// Route pour servir les fichiers JS et CSS du panel admin
+app.get('/admin.js', (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin.js'));
+});
+
+// Routes API
 // Route de connexion admin
 app.post('/api/admin/login', async (req, res) => {
     const { password } = req.body;
@@ -158,9 +168,12 @@ app.delete('/api/admin/products/:id', requireAuth, async (req, res) => {
     res.json({ success: true });
 });
 
-// Route pour servir le panel admin
-app.get('/admin', (req, res) => {
-    res.sendFile(path.join(__dirname, 'admin.html'));
+// Servir les fichiers statiques pour tout le reste
+app.use(express.static('.'));
+
+// Route par défaut pour les pages non trouvées (doit être après les routes statiques)
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // Initialiser les données au démarrage
