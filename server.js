@@ -22,14 +22,16 @@ let client;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Configuration des sessions
+// Configuration des sessions pour Vercel
 app.use(session({
-    secret: 'votre-secret-tres-securise',
+    secret: process.env.SESSION_SECRET || 'votre-secret-tres-securise-' + Math.random(),
     resave: false,
     saveUninitialized: false,
     cookie: { 
         secure: process.env.NODE_ENV === 'production',
-        maxAge: 24 * 60 * 60 * 1000 // 24 heures
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000, // 24 heures
+        sameSite: 'lax'
     }
 }));
 
@@ -353,10 +355,17 @@ app.delete('/api/admin/products/:id', requireAuth, async (req, res) => {
     }
 });
 
-// Connexion à MongoDB
+// Connexion MongoDB avec retry
 async function connectToDatabase() {
+    if (db) return db; // Réutiliser la connexion existante
+    
     try {
-        client = new MongoClient(MONGODB_URI);
+        const options = {
+            serverSelectionTimeoutMS: 5000,
+            socketTimeoutMS: 45000,
+        };
+        
+        client = new MongoClient(MONGODB_URI, options);
         await client.connect();
         db = client.db(DB_NAME);
         console.log('Connecté à MongoDB');
@@ -364,18 +373,32 @@ async function connectToDatabase() {
         // Initialiser les collections
         await initializeCollections();
         
-        // Générer le hash du mot de passe si nécessaire
+        // Générer le hash du mot de passe
         const hash = bcrypt.hashSync('JuniorAdmin123', 10);
-        console.log('Hash du mot de passe admin généré');
-        
-        // Mettre à jour le hash dans le code (pour l'instant on l'utilise directement)
         app.locals.adminPasswordHash = hash;
         
+        return db;
     } catch (error) {
         console.error('Erreur de connexion à MongoDB:', error);
-        process.exit(1);
+        throw error;
     }
 }
+
+// Middleware pour s'assurer que la DB est connectée
+async function ensureDatabase(req, res, next) {
+    try {
+        if (!db) {
+            await connectToDatabase();
+        }
+        next();
+    } catch (error) {
+        console.error('Erreur DB:', error);
+        res.status(500).json({ error: 'Erreur de connexion à la base de données' });
+    }
+}
+
+// Appliquer le middleware à toutes les routes API
+app.use('/api', ensureDatabase);
 
 // Servir les fichiers statiques pour tout le reste
 app.use(express.static('.'));
@@ -385,35 +408,14 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Démarrer le serveur
-async function startServer() {
-    try {
-        await connectToDatabase();
-        
-        app.listen(PORT, () => {
-            console.log(`🚀 Serveur démarré sur http://localhost:${PORT}`);
-            console.log(`📊 Panel admin accessible sur http://localhost:${PORT}/admin`);
-            console.log(`🔐 Mot de passe admin: JuniorAdmin123`);
-        });
-    } catch (error) {
-        console.error('Erreur lors du démarrage:', error);
-        process.exit(1);
-    }
-}
-
-// Gestion de l'arrêt gracieux
-process.on('SIGINT', async () => {
-    console.log('\n⏹️  Arrêt du serveur...');
-    if (client) {
-        await client.close();
-        console.log('🔌 Connexion MongoDB fermée');
-    }
-    process.exit(0);
-});
-
-// Pour le développement local
+// Démarrer le serveur (seulement en local)
 if (process.env.NODE_ENV !== 'production') {
-    startServer();
+    const PORT_LOCAL = PORT || 3000;
+    app.listen(PORT_LOCAL, () => {
+        console.log(`🚀 Serveur démarré sur http://localhost:${PORT_LOCAL}`);
+        console.log(`📊 Panel admin accessible sur http://localhost:${PORT_LOCAL}/admin`);
+        console.log(`🔐 Mot de passe admin: JuniorAdmin123`);
+    });
 }
 
 // Exporter l'app pour Vercel
