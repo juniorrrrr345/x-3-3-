@@ -3,8 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sahas terps - Boutique Premium</title>
+    <title>Détails du Produit - Boutique Premium</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        .product-detail-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: calc(100vh - 100px);
+        }
+
+        .product-detail {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 20px;
+        }
+
+        .video-section {
+            width: 100%;
+            margin-bottom: 30px;
+        }
+
+        .video-player {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            display: block;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .product-info-detail {
+            text-align: center;
+            color: white;
+        }
+
+        .product-title-detail {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .product-description {
+            font-size: 18px;
+            line-height: 1.8;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .price-section {
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+        }
+
+        .price-list {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .price-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            font-size: 18px;
+        }
+
+        .quantity {
+            font-weight: 600;
+        }
+
+        .price {
+            color: #4CAF50;
+            font-weight: 700;
+            font-size: 22px;
+        }
+
+        .order-button {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 600;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .order-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(102, 126, 234, 0.6);
+        }
+
+        .back-button {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+
+        .back-button:hover {
+            opacity: 1;
+        }
+    </style>
 </head>
 <body>
     <!-- Header avec logo -->
@@ -16,75 +132,48 @@
 
     <!-- Effet de flou -->
     <div class="blur-background"></div>
-    
-    <!-- Logo transparent -->
-    <div class="logo-overlay">
-        <img src="logo.png" alt="Logo" id="logoImg">
-    </div>
 
-    <!-- Contenu -->
-    <div class="container">
+    <div class="product-detail-container">
+        <a href="index.html" class="back-button">← Retour à la boutique</a>
+        
         <div class="product-detail">
-            <div class="detail-header">
-                <h1 class="detail-title">Sahas terps</h1>
-                
-                <div class="detail-variants">
-                    <ul class="variant-list">
-                        <li>Unicorz</li>
-                        <li>Marmalade</li>
-                        <li>Yellow Mints</li>
-                    </ul>
-                </div>
-
-                <div class="detail-badges">
-                    <span class="detail-badge">STATIC SIFT US 🇺🇸</span>
-                    <span class="detail-badge">PREMIUM</span>
-                </div>
-            </div>
-
-            <!-- Section Vidéo unique -->
             <div class="video-section">
-                <h2 class="video-title">📹 VIDÉO DU PRODUIT</h2>
-                <div class="video-container">
-                    <video controls poster="https://images.unsplash.com/photo-1597075388115-e59de916bdcc?w=600&h=800&fit=crop" id="productVideo">
-                        <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
-                        Votre navigateur ne supporte pas la vidéo.
-                    </video>
-                </div>
+                <video id="productVideo" class="video-player" controls>
+                    <source src="https://example.com/video.mp4" type="video/mp4">
+                    Votre navigateur ne supporte pas la lecture de vidéos.
+                </video>
             </div>
 
-            <div class="detail-description">
-                <p>• Tropicana Cookies<br>
-                130/73u<br>
-                Premium 12 sur 10 fresh pressed</p>
-            </div>
+            <div class="product-info-detail">
+                <h1 id="productTitle" class="product-title-detail">Nom du Produit</h1>
+                <p id="productDescription" class="product-description">
+                    Description détaillée du produit. Cette section contiendra toutes les informations
+                    importantes sur le produit, ses caractéristiques et ses avantages.
+                </p>
 
-            <div class="price-grid">
-                <div class="price-item">
-                    <div class="price-quantity">5g</div>
-                    <div class="price-amount">200€</div>
+                <div class="price-section">
+                    <h3 style="margin-bottom: 20px; font-size: 24px;">Tarifs</h3>
+                    <div id="priceList" class="price-list">
+                        <!-- Les prix seront chargés dynamiquement ici -->
+                        <div class="price-item">
+                            <span class="quantity">1 unité</span>
+                            <span class="price">29.99€</span>
+                        </div>
+                        <div class="price-item">
+                            <span class="quantity">3 unités</span>
+                            <span class="price">79.99€</span>
+                        </div>
+                        <div class="price-item">
+                            <span class="quantity">5 unités</span>
+                            <span class="price">119.99€</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="price-item">
-                    <div class="price-quantity">10g</div>
-                    <div class="price-amount">350€</div>
-                </div>
-                <div class="price-item">
-                    <div class="price-quantity">20g</div>
-                    <div class="price-amount">680€</div>
-                </div>
-                <div class="price-item">
-                    <div class="price-quantity">50g</div>
-                    <div class="price-amount">1300€</div>
-                </div>
-                <div class="price-item">
-                    <div class="price-quantity">100g</div>
-                    <div class="price-amount">2500€</div>
-                </div>
-            </div>
 
-            <a href="https://t.me/votre_telegram" class="order-button" target="_blank">
-                📱 COMMANDER VIA TELEGRAM
-            </a>
+                <a href="#" class="order-button" data-order-button target="_blank">
+                    📱 COMMANDER
+                </a>
+            </div>
         </div>
     </div>
 
@@ -92,7 +181,7 @@
     <nav class="bottom-nav">
         <div class="ios-bar"></div>
         <div class="nav-container">
-            <a href="index.html" class="nav-item active">
+            <a href="index.html" class="nav-item">
                 <span class="nav-icon">🏠</span>
                 <span class="nav-label">Menu</span>
             </a>
@@ -112,25 +201,57 @@
     </nav>
 
     <script src="app.js"></script>
+    <script src="site-config.js"></script>
     <script>
-        // Prêt pour MongoDB et Cloudinary
-        // Cette section sera mise à jour avec vos credentials
-        
-        // Exemple de structure pour récupérer les données depuis MongoDB
+        // Charger les données du produit
         async function loadProductData() {
             const urlParams = new URLSearchParams(window.location.search);
             const productId = urlParams.get('product');
             
-            // TODO: Remplacer par votre API MongoDB
-            // const response = await fetch(`/api/products/${productId}`);
-            // const product = await response.json();
+            // Pour l'instant, utiliser des données statiques
+            // TODO: Charger depuis MongoDB
+            const productData = {
+                'caliplates': {
+                    title: 'CALIPLATES',
+                    description: 'Les meilleures Caliplates du marché. Qualité premium garantie.',
+                    video: 'https://example.com/caliplates.mp4',
+                    prices: [
+                        { quantity: '1 unité', price: '29.99€' },
+                        { quantity: '3 unités', price: '79.99€' },
+                        { quantity: '5 unités', price: '119.99€' }
+                    ]
+                },
+                'sahas-terps': {
+                    title: 'Sahas terps',
+                    description: 'Terpènes de haute qualité pour une expérience unique.',
+                    video: 'https://example.com/sahas.mp4',
+                    prices: [
+                        { quantity: '10ml', price: '19.99€' },
+                        { quantity: '30ml', price: '49.99€' },
+                        { quantity: '50ml', price: '79.99€' }
+                    ]
+                }
+                // Ajouter d'autres produits ici
+            };
             
-            // TODO: Charger la vidéo depuis Cloudinary
-            // document.getElementById('productVideo').src = product.videoUrl;
+            const product = productData[productId] || productData['caliplates'];
+            
+            // Mettre à jour l'interface
+            document.getElementById('productTitle').textContent = product.title;
+            document.getElementById('productDescription').textContent = product.description;
+            
+            // Afficher les prix
+            const priceList = document.getElementById('priceList');
+            priceList.innerHTML = product.prices.map(p => `
+                <div class="price-item">
+                    <span class="quantity">${p.quantity}</span>
+                    <span class="price">${p.price}</span>
+                </div>
+            `).join('');
         }
         
         // Charger les données au chargement de la page
-        // loadProductData();
+        loadProductData();
     </script>
 </body>
 </html>
