@@ -5,124 +5,234 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Boutique Premium</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Styles pour les accordéons */
+        .accordion-section {
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .accordion-header {
+            padding: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.05);
+            transition: background 0.3s ease;
+            user-select: none;
+        }
+
+        .accordion-header:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .accordion-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 0;
+        }
+
+        .accordion-icon {
+            font-size: 24px;
+            transition: transform 0.3s ease;
+        }
+
+        .accordion-header.active .accordion-icon {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .accordion-content.show {
+            max-height: 2000px;
+            transition: max-height 0.5s ease-in;
+        }
+
+        .accordion-products {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        /* Responsive pour tablettes */
+        @media (max-width: 768px) {
+            .accordion-products {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 15px;
+                padding: 15px;
+            }
+
+            .accordion-title {
+                font-size: 20px;
+            }
+        }
+
+        /* Responsive pour mobiles */
+        @media (max-width: 480px) {
+            .accordion-products {
+                grid-template-columns: 1fr;
+                gap: 10px;
+                padding: 10px;
+            }
+
+            .accordion-header {
+                padding: 15px;
+            }
+
+            .accordion-title {
+                font-size: 18px;
+            }
+
+            .accordion-icon {
+                font-size: 20px;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- Header avec logo -->
     <header class="header">
         <div class="header-content">
-            <img src="logo.png" alt="Logo" class="header-logo" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%2250%22%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22 fill=%22white%22 font-size=%2224%22 font-weight=%22bold%22%3ELOGO%3C/text%3E%3C/svg%3E'">
+            <h1 class="header-title" data-site-title>Boutique Premium</h1>
         </div>
     </header>
 
     <!-- Effet de flou -->
     <div class="blur-background"></div>
-    
-    <!-- Logo transparent -->
-    <div class="logo-overlay">
-        <img src="logo.png" alt="Logo" id="logoImg">
-    </div>
 
-    <!-- Produits -->
+    <!-- Contenu -->
     <div class="container">
-        <div class="products-grid">
-            <!-- CALIPLATES -->
-            <a href="product-detail.html?product=caliplates" class="product-card">
-                <div class="product-image">
-                    <img src="https://images.unsplash.com/photo-1544928147-79a2dbc1f389?w=400&h=250&fit=crop&q=80" alt="CALIPLATES">
-                </div>
-                <div class="product-info">
-                    <h2 class="product-title">CALIPLATES</h2>
-                    <p class="product-subtitle">Plusieurs variétés</p>
-                </div>
-            </a>
+        <!-- Section Catégories -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h2 class="accordion-title">🏷️ CATÉGORIES</h2>
+                <span class="accordion-icon">▼</span>
+            </div>
+            <div class="accordion-content show">
+                <div class="accordion-products">
+                    <!-- CALIPLATES -->
+                    <a href="product-detail.html?product=caliplates" class="product-card">
+                        <div class="product-image">
+                            <img src="https://images.unsplash.com/photo-1597075388115-e59de916bdcc?w=400&h=250&fit=crop&q=80" alt="CALIPLATES">
+                        </div>
+                        <div class="product-info">
+                            <h2 class="product-title">CALIPLATES</h2>
+                            <p class="product-subtitle">Plusieurs variétés</p>
+                        </div>
+                    </a>
 
-            <!-- Sahas terps -->
-            <a href="product-detail.html?product=sahas-terps" class="product-card">
-                <div class="product-image">
-                    <img src="https://images.unsplash.com/photo-1598911543663-37d77962beb1?w=400&h=250&fit=crop&q=80" alt="Sahas terps">
-                </div>
-                <div class="product-info">
-                    <h2 class="product-title">Sahas terps</h2>
-                    <p class="product-subtitle">Plusieurs variétés</p>
-                </div>
-            </a>
+                    <!-- Sahas terps -->
+                    <a href="product-detail.html?product=sahas-terps" class="product-card">
+                        <div class="product-image">
+                            <img src="https://images.unsplash.com/photo-1597848212624-a19eb35e2651?w=400&h=250&fit=crop&q=80" alt="Sahas terps">
+                        </div>
+                        <div class="product-info">
+                            <h2 class="product-title">Sahas terps</h2>
+                            <p class="product-subtitle">Plusieurs variétés</p>
+                        </div>
+                    </a>
 
-            <!-- STATIC SIFT US -->
-            <a href="product-detail.html?product=static-sift-us" class="product-card">
-                <div class="product-image">
-                    <img src="https://images.unsplash.com/photo-1582657233895-0f37a3f150c0?w=400&h=250&fit=crop&q=80" alt="STATIC SIFT US">
-                </div>
-                <div class="product-info">
-                    <h2 class="product-title">STATIC SIFT US</h2>
-                    <p class="product-subtitle">Plusieurs variétés</p>
-                </div>
-            </a>
+                    <!-- STATIC SIFT US -->
+                    <a href="product-detail.html?product=static-sift-us" class="product-card">
+                        <div class="product-image">
+                            <img src="https://images.unsplash.com/photo-1582657233895-0f37a3f150c0?w=400&h=250&fit=crop&q=80" alt="STATIC SIFT US">
+                        </div>
+                        <div class="product-info">
+                            <h2 class="product-title">STATIC SIFT US</h2>
+                            <p class="product-subtitle">Plusieurs variétés</p>
+                        </div>
+                    </a>
 
-            <!-- HASH MAROCAIN -->
-            <a href="product-detail.html?product=hash-marocain" class="product-card">
-                <div class="product-image">
-                    <img src="https://images.unsplash.com/photo-1536819114556-1e10f967fb61?w=400&h=250&fit=crop&q=80" alt="HASH MAROCAIN">
-                </div>
-                <div class="product-info">
-                    <h2 class="product-title">HASH MAROCAIN</h2>
-                    <p class="product-subtitle">Plusieurs variétés</p>
-                </div>
-            </a>
+                    <!-- HASH MAROCAIN -->
+                    <a href="product-detail.html?product=hash-marocain" class="product-card">
+                        <div class="product-image">
+                            <img src="https://images.unsplash.com/photo-1536819114556-1e10f967fb61?w=400&h=250&fit=crop&q=80" alt="HASH MAROCAIN">
+                        </div>
+                        <div class="product-info">
+                            <h2 class="product-title">HASH MAROCAIN</h2>
+                            <p class="product-subtitle">Plusieurs variétés</p>
+                        </div>
+                    </a>
 
-            <!-- HASH AFGHAN -->
-            <a href="product-detail.html?product=hash-afghan" class="product-card">
-                <div class="product-image">
-                    <img src="https://images.unsplash.com/photo-1526575482212-b927f0915d55?w=400&h=250&fit=crop&q=80" alt="HASH AFGHAN">
+                    <!-- HASH AFGHAN -->
+                    <a href="product-detail.html?product=hash-afghan" class="product-card">
+                        <div class="product-image">
+                            <img src="https://images.unsplash.com/photo-1526575482212-b927f0915d55?w=400&h=250&fit=crop&q=80" alt="HASH AFGHAN">
+                        </div>
+                        <div class="product-info">
+                            <h2 class="product-title">HASH AFGHAN</h2>
+                            <p class="product-subtitle">Plusieurs variétés</p>
+                        </div>
+                    </a>
                 </div>
-                <div class="product-info">
-                    <h2 class="product-title">HASH AFGHAN</h2>
-                    <p class="product-subtitle">Plusieurs variétés</p>
-                </div>
-            </a>
+            </div>
+        </div>
 
-            <!-- TRIM CBD -->
-            <a href="product-detail.html?product=trim-cbd" class="product-card">
-                <div class="product-image">
-                    <img src="https://images.unsplash.com/photo-1556928045-16f7f50be0f3?w=400&h=250&fit=crop&q=80" alt="TRIM CBD">
-                </div>
-                <div class="product-info">
-                    <h2 class="product-title">TRIM CBD</h2>
-                    <p class="product-subtitle">Plusieurs variétés</p>
-                </div>
-            </a>
+        <!-- Section Farm -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h2 class="accordion-title">🌱 FARM</h2>
+                <span class="accordion-icon">▼</span>
+            </div>
+            <div class="accordion-content show">
+                <div class="accordion-products">
+                    <!-- TRIM CBD -->
+                    <a href="product-detail.html?product=trim-cbd" class="product-card">
+                        <div class="product-image">
+                            <img src="https://images.unsplash.com/photo-1556928045-16f7f50be0f3?w=400&h=250&fit=crop&q=80" alt="TRIM CBD">
+                        </div>
+                        <div class="product-info">
+                            <h2 class="product-title">TRIM CBD</h2>
+                            <p class="product-subtitle">Plusieurs variétés</p>
+                        </div>
+                    </a>
 
-            <!-- FLEURS HHCP -->
-            <a href="product-detail.html?product=fleurs-hhcp" class="product-card">
-                <div class="product-image">
-                    <img src="https://images.unsplash.com/photo-1603909223200-29690d683e64?w=400&h=250&fit=crop&q=80" alt="FLEURS HHCP">
-                </div>
-                <div class="product-info">
-                    <h2 class="product-title">FLEURS HHCP</h2>
-                    <p class="product-subtitle">Plusieurs variétés</p>
-                </div>
-            </a>
+                    <!-- FLEURS HHCP -->
+                    <a href="product-detail.html?product=fleurs-hhcp" class="product-card">
+                        <div class="product-image">
+                            <img src="https://images.unsplash.com/photo-1603909223200-29690d683e64?w=400&h=250&fit=crop&q=80" alt="FLEURS HHCP">
+                        </div>
+                        <div class="product-info">
+                            <h2 class="product-title">FLEURS HHCP</h2>
+                            <p class="product-subtitle">Plusieurs variétés</p>
+                        </div>
+                    </a>
 
-            <!-- VAPES HHCP -->
-            <a href="product-detail.html?product=vapes-hhcp" class="product-card">
-                <div class="product-image">
-                    <img src="https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=400&h=250&fit=crop&q=80" alt="VAPES HHCP">
-                </div>
-                <div class="product-info">
-                    <h2 class="product-title">VAPES HHCP</h2>
-                    <p class="product-subtitle">Plusieurs variétés</p>
-                </div>
-            </a>
+                    <!-- VAPES HHCP -->
+                    <a href="product-detail.html?product=vapes-hhcp" class="product-card">
+                        <div class="product-image">
+                            <img src="https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=400&h=250&fit=crop&q=80" alt="VAPES HHCP">
+                        </div>
+                        <div class="product-info">
+                            <h2 class="product-title">VAPES HHCP</h2>
+                            <p class="product-subtitle">Plusieurs variétés</p>
+                        </div>
+                    </a>
 
-            <!-- THCP -->
-            <a href="product-detail.html?product=thcp" class="product-card">
-                <div class="product-image">
-                    <img src="https://images.unsplash.com/photo-1616093619471-3959b0581d60?w=400&h=250&fit=crop&q=80" alt="THCP">
+                    <!-- THCP -->
+                    <a href="product-detail.html?product=thcp" class="product-card">
+                        <div class="product-image">
+                            <img src="https://images.unsplash.com/photo-1616093619471-3959b0581d60?w=400&h=250&fit=crop&q=80" alt="THCP">
+                        </div>
+                        <div class="product-info">
+                            <h2 class="product-title">THCP</h2>
+                            <p class="product-subtitle">Plusieurs variétés</p>
+                        </div>
+                    </a>
                 </div>
-                <div class="product-info">
-                    <h2 class="product-title">THCP</h2>
-                    <p class="product-subtitle">Plusieurs variétés</p>
-                </div>
-            </a>
+            </div>
         </div>
     </div>
 
@@ -151,5 +261,29 @@
 
     <script src="app.js"></script>
     <script src="site-config.js"></script>
+    <script>
+        // Fonction pour gérer les accordéons
+        function toggleAccordion(header) {
+            const content = header.nextElementSibling;
+            const isOpen = content.classList.contains('show');
+            
+            // Toggle l'état
+            if (isOpen) {
+                content.classList.remove('show');
+                header.classList.remove('active');
+            } else {
+                content.classList.add('show');
+                header.classList.add('active');
+            }
+        }
+
+        // Ouvrir les deux accordéons par défaut
+        document.addEventListener('DOMContentLoaded', function() {
+            const accordionHeaders = document.querySelectorAll('.accordion-header');
+            accordionHeaders.forEach(header => {
+                header.classList.add('active');
+            });
+        });
+    </script>
 </body>
 </html>

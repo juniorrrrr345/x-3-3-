@@ -5,54 +5,51 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Infos - Boutique Premium</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        .info-content {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 20px;
+            min-height: 400px;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .info-text {
+            color: white;
+            font-size: 18px;
+            line-height: 1.8;
+            white-space: pre-wrap;
+        }
+    </style>
 </head>
 <body>
     <!-- Header avec logo -->
     <header class="header">
         <div class="header-content">
-            <img src="logo.png" alt="Logo" class="header-logo" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%2250%22%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22 fill=%22white%22 font-size=%2224%22 font-weight=%22bold%22%3ELOGO%3C/text%3E%3C/svg%3E'">
+            <h1 class="header-title" data-site-title>Boutique Premium</h1>
         </div>
     </header>
 
     <!-- Effet de flou -->
     <div class="blur-background"></div>
-    
-    <!-- Logo transparent -->
-    <div class="logo-overlay">
-        <img src="logo.png" alt="Logo" id="logoImg">
-    </div>
 
     <!-- Contenu -->
     <div class="container">
         <div class="info-content">
-            <h1 class="page-title">INFORMATIONS</h1>
-            
-            <div class="info-section">
-                <h2>📦 Livraison</h2>
-                <p>Livraison discrète sous 24-48h<br>
-                Emballage neutre et sécurisé<br>
-                Suivi en temps réel</p>
-            </div>
-
-            <div class="info-section">
-                <h2>🔒 Sécurité</h2>
-                <p>Paiement 100% sécurisé<br>
-                Données cryptées<br>
-                Anonymat garanti</p>
-            </div>
-
-            <div class="info-section">
-                <h2>✅ Qualité</h2>
-                <p>Produits testés en laboratoire<br>
-                Origine certifiée USA<br>
-                Satisfaction garantie</p>
-            </div>
-
-            <div class="info-section">
-                <h2>💎 Avantages VIP</h2>
-                <p>-20% sur toutes les commandes<br>
-                Accès aux éditions limitées<br>
-                Support prioritaire 24/7</p>
+            <h1 class="page-title" id="infoTitle">INFORMATIONS</h1>
+            <div class="info-text" id="infoContent">
+                <!-- Le contenu sera chargé dynamiquement -->
             </div>
         </div>
     </div>
@@ -79,5 +76,48 @@
             </a>
         </div>
     </nav>
+
+    <script src="app.js"></script>
+    <script src="site-config.js"></script>
+    <script>
+        // Charger le contenu info
+        async function loadInfoContent() {
+            try {
+                const response = await fetch('/api/info-content');
+                const data = await response.json();
+                
+                if (data.title) {
+                    document.getElementById('infoTitle').textContent = data.title;
+                }
+                
+                if (data.content) {
+                    document.getElementById('infoContent').textContent = data.content;
+                } else {
+                    // Contenu par défaut si rien n'est configuré
+                    document.getElementById('infoContent').innerHTML = `
+                        <h2>📦 Livraison</h2>
+                        <p>Livraison discrète sous 24-48h<br>
+                        Emballage neutre et sécurisé<br>
+                        Suivi en temps réel</p>
+                        
+                        <h2>🔒 Sécurité</h2>
+                        <p>Paiement 100% sécurisé<br>
+                        Données cryptées<br>
+                        Anonymat garanti</p>
+                        
+                        <h2>✅ Qualité</h2>
+                        <p>Produits testés en laboratoire<br>
+                        Origine certifiée USA<br>
+                        Satisfaction garantie</p>
+                    `;
+                }
+            } catch (error) {
+                console.error('Erreur lors du chargement du contenu:', error);
+            }
+        }
+        
+        // Charger le contenu au chargement de la page
+        loadInfoContent();
+    </script>
 </body>
 </html>

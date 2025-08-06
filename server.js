@@ -102,13 +102,35 @@ async function initializeCollections() {
     }
 }
 
-// Middleware d'authentification
-function requireAuth(req, res, next) {
-    if (!req.session.isAdmin) {
-        return res.status(401).json({ error: 'Non autorisé' });
+// Routes d'authentification
+app.post('/api/auth/login', (req, res) => {
+    const { password } = req.body;
+    
+    if (bcrypt.compareSync(password, ADMIN_PASSWORD_HASH)) {
+        req.session.isAdmin = true;
+        res.json({ success: true });
+    } else {
+        res.status(401).json({ success: false });
     }
-    next();
-}
+});
+
+app.post('/api/auth/logout', (req, res) => {
+    req.session.destroy();
+    res.json({ success: true });
+});
+
+app.get('/api/auth/check', (req, res) => {
+    res.json({ authenticated: req.session.isAdmin || false });
+});
+
+// Middleware pour vérifier l'authentification admin
+const requireAuth = (req, res, next) => {
+    if (req.session.isAdmin) {
+        next();
+    } else {
+        res.status(401).json({ error: 'Non autorisé' });
+    }
+};
 
 // Route pour servir le panel admin
 app.get('/admin', (req, res) => {
@@ -118,36 +140,6 @@ app.get('/admin', (req, res) => {
 // Route pour servir les fichiers JS et CSS du panel admin
 app.get('/admin.js', (req, res) => {
     res.sendFile(path.join(__dirname, 'admin.js'));
-});
-
-// Routes API
-// Route de connexion admin
-app.post('/api/admin/login', async (req, res) => {
-    const { password } = req.body;
-    
-    if (!password) {
-        return res.status(400).json({ error: 'Mot de passe requis' });
-    }
-    
-    const isValid = await bcrypt.compare(password, ADMIN_PASSWORD_HASH);
-    
-    if (isValid) {
-        req.session.isAdmin = true;
-        res.json({ success: true });
-    } else {
-        res.status(401).json({ error: 'Mot de passe incorrect' });
-    }
-});
-
-// Route de déconnexion
-app.post('/api/admin/logout', (req, res) => {
-    req.session.destroy();
-    res.json({ success: true });
-});
-
-// Vérifier l'état de connexion
-app.get('/api/admin/check', (req, res) => {
-    res.json({ isAdmin: !!req.session.isAdmin });
 });
 
 // API pour obtenir tous les paramètres
@@ -251,6 +243,54 @@ app.put('/api/admin/order-button', requireAuth, async (req, res) => {
             { upsert: true }
         );
         res.json({ success: true, orderButton: req.body });
+    } catch (error) {
+        res.status(500).json({ error: 'Erreur lors de la mise à jour' });
+    }
+});
+
+// API pour la page Info
+app.get('/api/info-content', async (req, res) => {
+    try {
+        const settings = await db.collection('settings').findOne({ _id: 'site-settings' });
+        res.json(settings?.infoContent || { title: 'Informations', content: '' });
+    } catch (error) {
+        res.status(500).json({ error: 'Erreur lors de la récupération' });
+    }
+});
+
+// API pour mettre à jour la page Info (admin seulement)
+app.put('/api/admin/info-content', requireAuth, async (req, res) => {
+    try {
+        await db.collection('settings').updateOne(
+            { _id: 'site-settings' },
+            { $set: { infoContent: req.body } },
+            { upsert: true }
+        );
+        res.json({ success: true, content: req.body });
+    } catch (error) {
+        res.status(500).json({ error: 'Erreur lors de la mise à jour' });
+    }
+});
+
+// API pour la page Canal (réseaux sociaux)
+app.get('/api/canal-networks', async (req, res) => {
+    try {
+        const settings = await db.collection('settings').findOne({ _id: 'site-settings' });
+        res.json(settings?.canalNetworks || []);
+    } catch (error) {
+        res.status(500).json({ error: 'Erreur lors de la récupération' });
+    }
+});
+
+// API pour mettre à jour les réseaux de la page Canal (admin seulement)
+app.put('/api/admin/canal-networks', requireAuth, async (req, res) => {
+    try {
+        await db.collection('settings').updateOne(
+            { _id: 'site-settings' },
+            { $set: { canalNetworks: req.body } },
+            { upsert: true }
+        );
+        res.json({ success: true, networks: req.body });
     } catch (error) {
         res.status(500).json({ error: 'Erreur lors de la mise à jour' });
     }

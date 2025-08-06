@@ -208,46 +208,59 @@
             const urlParams = new URLSearchParams(window.location.search);
             const productId = urlParams.get('product');
             
-            // Pour l'instant, utiliser des données statiques
-            // TODO: Charger depuis MongoDB
-            const productData = {
-                'caliplates': {
-                    title: 'CALIPLATES',
-                    description: 'Les meilleures Caliplates du marché. Qualité premium garantie.',
-                    video: 'https://example.com/caliplates.mp4',
-                    prices: [
-                        { quantity: '1 unité', price: '29.99€' },
-                        { quantity: '3 unités', price: '79.99€' },
-                        { quantity: '5 unités', price: '119.99€' }
-                    ]
-                },
-                'sahas-terps': {
-                    title: 'Sahas terps',
-                    description: 'Terpènes de haute qualité pour une expérience unique.',
-                    video: 'https://example.com/sahas.mp4',
-                    prices: [
-                        { quantity: '10ml', price: '19.99€' },
-                        { quantity: '30ml', price: '49.99€' },
-                        { quantity: '50ml', price: '79.99€' }
-                    ]
+            try {
+                // Charger tous les produits depuis MongoDB
+                const response = await fetch('/api/products');
+                const products = await response.json();
+                
+                // Trouver le produit correspondant
+                const product = products.find(p => p.slug === productId || p.name.toLowerCase().replace(/\s+/g, '-') === productId);
+                
+                if (product) {
+                    // Mettre à jour l'interface
+                    document.getElementById('productTitle').textContent = product.name;
+                    document.getElementById('productDescription').textContent = product.description;
+                    
+                    // Mettre à jour la vidéo si disponible
+                    if (product.video) {
+                        document.getElementById('productVideo').src = product.video;
+                    }
+                    
+                    // Afficher les prix
+                    const priceList = document.getElementById('priceList');
+                    if (product.prices && product.prices.length > 0) {
+                        priceList.innerHTML = product.prices.map(p => `
+                            <div class="price-item">
+                                <span class="quantity">${p.quantity}</span>
+                                <span class="price">${p.price}</span>
+                            </div>
+                        `).join('');
+                    } else {
+                        // Prix par défaut si aucun prix n'est défini
+                        priceList.innerHTML = `
+                            <div class="price-item">
+                                <span class="quantity">1 unité</span>
+                                <span class="price">${product.price || '29.99€'}</span>
+                            </div>
+                        `;
+                    }
+                } else {
+                    // Produit non trouvé - utiliser des données par défaut
+                    document.getElementById('productTitle').textContent = 'Produit';
+                    document.getElementById('productDescription').textContent = 'Description du produit non disponible.';
+                    document.getElementById('priceList').innerHTML = `
+                        <div class="price-item">
+                            <span class="quantity">1 unité</span>
+                            <span class="price">Prix sur demande</span>
+                        </div>
+                    `;
                 }
-                // Ajouter d'autres produits ici
-            };
-            
-            const product = productData[productId] || productData['caliplates'];
-            
-            // Mettre à jour l'interface
-            document.getElementById('productTitle').textContent = product.title;
-            document.getElementById('productDescription').textContent = product.description;
-            
-            // Afficher les prix
-            const priceList = document.getElementById('priceList');
-            priceList.innerHTML = product.prices.map(p => `
-                <div class="price-item">
-                    <span class="quantity">${p.quantity}</span>
-                    <span class="price">${p.price}</span>
-                </div>
-            `).join('');
+            } catch (error) {
+                console.error('Erreur lors du chargement du produit:', error);
+                // Utiliser des données par défaut en cas d'erreur
+                document.getElementById('productTitle').textContent = 'Produit';
+                document.getElementById('productDescription').textContent = 'Impossible de charger les détails du produit.';
+            }
         }
         
         // Charger les données au chargement de la page

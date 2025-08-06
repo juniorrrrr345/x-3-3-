@@ -1,92 +1,91 @@
-// État de l'application
+// Variables globales
 let isAuthenticated = false;
 let allSettings = {};
-let products = [];
-
-// Éléments DOM
-const loginContainer = document.getElementById('loginContainer');
-const adminContainer = document.getElementById('adminContainer');
-const loginForm = document.getElementById('loginForm');
-const socialForm = document.getElementById('socialForm');
-const contactForm = document.getElementById('contactForm');
-const productForm = document.getElementById('productForm');
-const productModal = document.getElementById('productModal');
-const successAlert = document.getElementById('successAlert');
-const errorAlert = document.getElementById('errorAlert');
+let canalNetworks = [];
+let currentEditingProduct = null;
 
 // Vérifier l'authentification au chargement
-document.addEventListener('DOMContentLoaded', async () => {
-    const response = await fetch('/api/admin/check');
+window.addEventListener('DOMContentLoaded', async () => {
+    const response = await fetch('/api/auth/check');
     const data = await response.json();
     
-    if (data.isAdmin) {
+    if (data.authenticated) {
         showAdminPanel();
+    } else {
+        showLoginForm();
     }
-
-    // Gérer les radio buttons pour le type de titre
-    document.getElementById('useTextTitle').addEventListener('change', handleTitleTypeChange);
-    document.getElementById('useLogoTitle').addEventListener('change', handleTitleTypeChange);
-    
-    // Synchroniser les inputs de couleur
-    setupColorSync('backgroundColor', 'backgroundColorText');
-    setupColorSync('orderButtonBgColor', 'orderButtonBgColorText');
-    setupColorSync('orderButtonTextColor', 'orderButtonTextColorText');
 });
 
-// Synchroniser les inputs de couleur
-function setupColorSync(colorId, textId) {
-    const colorInput = document.getElementById(colorId);
-    const textInput = document.getElementById(textId);
-    
-    colorInput.addEventListener('change', () => {
-        textInput.value = colorInput.value;
-    });
-    
-    textInput.addEventListener('change', () => {
-        if (/^#[0-9A-F]{6}$/i.test(textInput.value)) {
-            colorInput.value = textInput.value;
-        }
-    });
+// Afficher le formulaire de connexion
+function showLoginForm() {
+    document.getElementById('loginContainer').style.display = 'flex';
+    document.getElementById('adminContainer').style.display = 'none';
 }
 
-// Gestion de la connexion
-loginForm.addEventListener('submit', async (e) => {
+// Afficher le panel admin
+function showAdminPanel() {
+    document.getElementById('loginContainer').style.display = 'none';
+    document.getElementById('adminContainer').style.display = 'block';
+    isAuthenticated = true;
+    loadAllSettings();
+    loadProducts();
+}
+
+// Gérer la connexion
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
     const password = document.getElementById('password').value;
     
     try {
-        const response = await fetch('/api/admin/login', {
+        const response = await fetch('/api/auth/login', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+            },
             body: JSON.stringify({ password })
         });
         
         const data = await response.json();
         
-        if (response.ok) {
+        if (data.success) {
             showAdminPanel();
         } else {
-            showError(data.error || 'Erreur de connexion');
+            showError('Mot de passe incorrect');
         }
     } catch (error) {
-        showError('Erreur de connexion au serveur');
+        showError('Erreur de connexion');
     }
 });
 
-// Afficher le panel admin
-function showAdminPanel() {
-    isAuthenticated = true;
-    loginContainer.style.display = 'none';
-    adminContainer.style.display = 'block';
-    loadAllSettings();
-    loadProducts();
-}
-
 // Déconnexion
 async function logout() {
-    await fetch('/api/admin/logout', { method: 'POST' });
-    window.location.reload();
+    try {
+        await fetch('/api/auth/logout', { method: 'POST' });
+        showLoginForm();
+        document.getElementById('password').value = '';
+    } catch (error) {
+        console.error('Erreur lors de la déconnexion:', error);
+    }
+}
+
+// Afficher les messages
+function showSuccess(message) {
+    const alert = document.getElementById('successAlert');
+    alert.textContent = message;
+    alert.style.display = 'block';
+    setTimeout(() => {
+        alert.style.display = 'none';
+    }, 3000);
+}
+
+function showError(message) {
+    const alert = document.getElementById('errorAlert');
+    alert.textContent = message;
+    alert.style.display = 'block';
+    setTimeout(() => {
+        alert.style.display = 'none';
+    }, 3000);
 }
 
 // Changer d'onglet
@@ -106,15 +105,43 @@ function switchTab(tabName) {
     // Charger les données si nécessaire
     if (tabName === 'products') {
         loadProducts();
+    } else if (tabName === 'canal') {
+        loadCanalNetworks();
+    } else if (tabName === 'info') {
+        loadInfoContent();
     }
 }
 
 // Gérer le changement de type de titre
+document.getElementById('useTextTitle').addEventListener('change', handleTitleTypeChange);
+document.getElementById('useLogoTitle').addEventListener('change', handleTitleTypeChange);
+
 function handleTitleTypeChange() {
     const useText = document.getElementById('useTextTitle').checked;
     document.getElementById('textTitleSection').style.display = useText ? 'block' : 'none';
     document.getElementById('logoSection').style.display = useText ? 'none' : 'block';
 }
+
+// Gérer le changement de type de fond
+document.getElementById('useImageBg').addEventListener('change', handleBackgroundTypeChange);
+document.getElementById('useColorBg').addEventListener('change', handleBackgroundTypeChange);
+
+function handleBackgroundTypeChange() {
+    const useImage = document.getElementById('useImageBg').checked;
+    document.getElementById('imageBgSection').style.display = useImage ? 'block' : 'none';
+    document.getElementById('colorBgSection').style.display = useImage ? 'none' : 'block';
+}
+
+// Prévisualiser le logo
+document.getElementById('logoUrl').addEventListener('input', (e) => {
+    const url = e.target.value;
+    if (url) {
+        document.getElementById('logoPreview').style.display = 'block';
+        document.getElementById('logoPreviewImg').src = url;
+    } else {
+        document.getElementById('logoPreview').style.display = 'none';
+    }
+});
 
 // Charger tous les paramètres
 async function loadAllSettings() {
@@ -158,56 +185,78 @@ function loadSiteSettings(siteSettings) {
     
     document.getElementById('siteTitle').value = siteSettings.title || '';
     document.getElementById('logoUrl').value = siteSettings.logoUrl || '';
+    
+    if (siteSettings.backgroundType === 'color') {
+        document.getElementById('useColorBg').checked = true;
+        document.getElementById('useImageBg').checked = false;
+    } else {
+        document.getElementById('useImageBg').checked = true;
+        document.getElementById('useColorBg').checked = false;
+    }
+    
     document.getElementById('backgroundImage').value = siteSettings.backgroundImage || '';
-    document.getElementById('backgroundColor').value = siteSettings.backgroundColor || '#000000';
-    document.getElementById('backgroundColorText').value = siteSettings.backgroundColor || '#000000';
+    document.getElementById('backgroundColor').value = siteSettings.backgroundColor || '#1a1a2e';
     
     handleTitleTypeChange();
+    handleBackgroundTypeChange();
+    
+    // Prévisualiser le logo si présent
+    if (siteSettings.logoUrl) {
+        document.getElementById('logoPreview').style.display = 'block';
+        document.getElementById('logoPreviewImg').src = siteSettings.logoUrl;
+    }
 }
 
 // Charger les paramètres des réseaux sociaux
 function loadSocialSettings(socialSettings) {
-    document.getElementById('telegramLink').value = socialSettings.telegram || '';
-    document.getElementById('whatsappLink').value = socialSettings.whatsapp || '';
     document.getElementById('instagramLink').value = socialSettings.instagram || '';
+    document.getElementById('telegramLink').value = socialSettings.telegram || '';
     document.getElementById('snapchatLink').value = socialSettings.snapchat || '';
 }
 
 // Charger le contenu contact
 function loadContactContent(contactContent) {
     document.getElementById('contactTitle').value = contactContent.title || '';
-    document.getElementById('contactMainText').value = contactContent.mainText || '';
-    document.getElementById('contactEmail').value = contactContent.email || '';
-    document.getElementById('contactResponseTime').value = contactContent.responseTime || '';
-    document.getElementById('contactAdditionalInfo').value = contactContent.additionalInfo || '';
+    document.getElementById('contactContent').value = contactContent.content || '';
+}
+
+// Charger le contenu info
+async function loadInfoContent() {
+    try {
+        const response = await fetch('/api/info-content');
+        const infoContent = await response.json();
+        document.getElementById('infoTitle').value = infoContent.title || '';
+        document.getElementById('infoContent').value = infoContent.content || '';
+    } catch (error) {
+        showError('Erreur lors du chargement du contenu info');
+    }
 }
 
 // Charger les paramètres du bouton commander
 function loadOrderButtonSettings(buttonSettings) {
-    document.getElementById('orderButtonText').value = buttonSettings.text || 'Commander';
+    document.getElementById('orderButtonText').value = buttonSettings.text || '📱 COMMANDER';
     document.getElementById('orderButtonLink').value = buttonSettings.link || '';
-    document.getElementById('orderButtonBgColor').value = buttonSettings.backgroundColor || '#667eea';
-    document.getElementById('orderButtonBgColorText').value = buttonSettings.backgroundColor || '#667eea';
-    document.getElementById('orderButtonTextColor').value = buttonSettings.textColor || '#ffffff';
-    document.getElementById('orderButtonTextColorText').value = buttonSettings.textColor || '#ffffff';
+    document.getElementById('orderButtonColor').value = buttonSettings.color || '#667eea';
 }
 
 // Sauvegarder tous les paramètres du site
 async function saveAllSiteSettings() {
     const useTextTitle = document.getElementById('useTextTitle').checked;
+    const useImageBg = document.getElementById('useImageBg').checked;
+    
     const siteSettings = {
         title: document.getElementById('siteTitle').value,
         logoUrl: document.getElementById('logoUrl').value,
         useTextTitle: useTextTitle,
         backgroundImage: document.getElementById('backgroundImage').value,
-        backgroundColor: document.getElementById('backgroundColor').value
+        backgroundColor: document.getElementById('backgroundColor').value,
+        backgroundType: useImageBg ? 'image' : 'color'
     };
     
-    const orderButtonSettings = {
+    const orderButton = {
         text: document.getElementById('orderButtonText').value,
         link: document.getElementById('orderButtonLink').value,
-        backgroundColor: document.getElementById('orderButtonBgColor').value,
-        textColor: document.getElementById('orderButtonTextColor').value
+        color: document.getElementById('orderButtonColor').value
     };
     
     try {
@@ -222,27 +271,26 @@ async function saveAllSiteSettings() {
         const buttonResponse = await fetch('/api/admin/order-button', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(orderButtonSettings)
+            body: JSON.stringify(orderButton)
         });
         
         if (siteResponse.ok && buttonResponse.ok) {
-            showSuccess('Paramètres d\'apparence mis à jour avec succès');
+            showSuccess('Paramètres d\'apparence enregistrés avec succès');
         } else {
-            showError('Erreur lors de la mise à jour');
+            showError('Erreur lors de l\'enregistrement');
         }
     } catch (error) {
-        showError('Erreur de connexion au serveur');
+        showError('Erreur lors de l\'enregistrement');
     }
 }
 
-// Sauvegarder les réseaux sociaux
-socialForm.addEventListener('submit', async (e) => {
+// Gérer le formulaire des réseaux sociaux
+document.getElementById('socialForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    const socialSettings = {
-        telegram: document.getElementById('telegramLink').value,
-        whatsapp: document.getElementById('whatsappLink').value,
+    const socialData = {
         instagram: document.getElementById('instagramLink').value,
+        telegram: document.getElementById('telegramLink').value,
         snapchat: document.getElementById('snapchatLink').value
     };
     
@@ -250,156 +298,260 @@ socialForm.addEventListener('submit', async (e) => {
         const response = await fetch('/api/admin/social-settings', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(socialSettings)
+            body: JSON.stringify(socialData)
         });
         
         if (response.ok) {
-            showSuccess('Réseaux sociaux mis à jour avec succès');
+            showSuccess('Réseaux sociaux enregistrés avec succès');
         } else {
-            showError('Erreur lors de la mise à jour');
+            showError('Erreur lors de l\'enregistrement');
         }
     } catch (error) {
-        showError('Erreur de connexion au serveur');
+        showError('Erreur lors de l\'enregistrement');
     }
 });
 
-// Sauvegarder le contenu de la page contact
-contactForm.addEventListener('submit', async (e) => {
+// Gérer le formulaire contact
+document.getElementById('contactForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    const updatedContent = {
+    const contactData = {
         title: document.getElementById('contactTitle').value,
-        mainText: document.getElementById('contactMainText').value,
-        email: document.getElementById('contactEmail').value,
-        responseTime: document.getElementById('contactResponseTime').value,
-        additionalInfo: document.getElementById('contactAdditionalInfo').value
+        content: document.getElementById('contactContent').value
     };
     
     try {
         const response = await fetch('/api/admin/contact-content', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(updatedContent)
+            body: JSON.stringify(contactData)
         });
         
         if (response.ok) {
-            showSuccess('Contenu mis à jour avec succès');
+            showSuccess('Page contact mise à jour avec succès');
         } else {
             showError('Erreur lors de la mise à jour');
         }
     } catch (error) {
-        showError('Erreur de connexion au serveur');
+        showError('Erreur lors de la mise à jour');
     }
 });
 
-// Charger les produits
+// Gérer le formulaire info
+document.getElementById('infoForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const infoData = {
+        title: document.getElementById('infoTitle').value,
+        content: document.getElementById('infoContent').value
+    };
+    
+    try {
+        const response = await fetch('/api/admin/info-content', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(infoData)
+        });
+        
+        if (response.ok) {
+            showSuccess('Page info mise à jour avec succès');
+        } else {
+            showError('Erreur lors de la mise à jour');
+        }
+    } catch (error) {
+        showError('Erreur lors de la mise à jour');
+    }
+});
+
+// Gestion des réseaux Canal
+async function loadCanalNetworks() {
+    try {
+        const response = await fetch('/api/canal-networks');
+        canalNetworks = await response.json();
+        displayCanalNetworks();
+    } catch (error) {
+        showError('Erreur lors du chargement des réseaux');
+    }
+}
+
+function displayCanalNetworks() {
+    const container = document.getElementById('canalNetworks');
+    container.innerHTML = '';
+    
+    canalNetworks.forEach((network, index) => {
+        const networkDiv = document.createElement('div');
+        networkDiv.className = 'canal-network-item';
+        networkDiv.innerHTML = `
+            <input type="text" class="emoji-input" value="${network.emoji || ''}" placeholder="📱" onchange="updateCanalNetwork(${index}, 'emoji', this.value)">
+            <input type="text" value="${network.name || ''}" placeholder="Nom du réseau" onchange="updateCanalNetwork(${index}, 'name', this.value)">
+            <input type="url" value="${network.link || ''}" placeholder="https://..." onchange="updateCanalNetwork(${index}, 'link', this.value)">
+            <button class="remove-btn" onclick="removeCanalNetwork(${index})">Supprimer</button>
+        `;
+        container.appendChild(networkDiv);
+    });
+}
+
+function addCanalNetwork() {
+    canalNetworks.push({ emoji: '', name: '', link: '' });
+    displayCanalNetworks();
+}
+
+function updateCanalNetwork(index, field, value) {
+    canalNetworks[index][field] = value;
+}
+
+function removeCanalNetwork(index) {
+    canalNetworks.splice(index, 1);
+    displayCanalNetworks();
+}
+
+async function saveCanalNetworks() {
+    try {
+        const response = await fetch('/api/admin/canal-networks', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(canalNetworks)
+        });
+        
+        if (response.ok) {
+            showSuccess('Réseaux de la page Canal enregistrés');
+        } else {
+            showError('Erreur lors de l\'enregistrement');
+        }
+    } catch (error) {
+        showError('Erreur lors de l\'enregistrement');
+    }
+}
+
+// Gestion des produits
 async function loadProducts() {
     try {
         const response = await fetch('/api/products');
-        products = await response.json();
-        displayProducts();
+        const products = await response.json();
+        displayProducts(products);
     } catch (error) {
         showError('Erreur lors du chargement des produits');
     }
 }
 
-// Afficher les produits
-function displayProducts() {
-    const productGrid = document.getElementById('productGrid');
+function displayProducts(products) {
+    const container = document.getElementById('productsList');
+    container.innerHTML = '';
     
-    if (products.length === 0) {
-        productGrid.innerHTML = '<p style="text-align: center; color: #6e6e73;">Aucun produit pour le moment</p>';
-        return;
-    }
-    
-    productGrid.innerHTML = products.map(product => `
-        <div class="product-card">
-            <img src="${product.image}" alt="${product.name}" class="product-image" onerror="this.src='https://via.placeholder.com/300x300?text=Image'">
-            <h3 class="product-name">${product.name}</h3>
-            <p class="product-price">${product.price}€</p>
-            <p style="font-size: 14px; color: #6e6e73;">${product.category}</p>
+    products.forEach(product => {
+        const productCard = document.createElement('div');
+        productCard.className = 'product-item';
+        productCard.innerHTML = `
+            <img src="${product.image}" alt="${product.name}">
+            <h3>${product.name}</h3>
+            <p>${product.description}</p>
             <div class="product-actions">
-                <button class="btn-small btn-edit" onclick="editProduct('${product._id || product.id}')">Modifier</button>
-                <button class="btn-small btn-delete" onclick="deleteProduct('${product._id || product.id}')">Supprimer</button>
+                <button onclick="editProduct('${product._id}')">Modifier</button>
+                <button onclick="deleteProduct('${product._id}')">Supprimer</button>
             </div>
-        </div>
-    `).join('');
+        `;
+        container.appendChild(productCard);
+    });
 }
 
-// Ouvrir le modal produit
-function openProductModal(productId = null) {
-    const modalTitle = document.getElementById('modalTitle');
-    const form = document.getElementById('productForm');
-    
-    if (productId) {
-        const product = products.find(p => (p._id || p.id) === productId);
-        modalTitle.textContent = 'Modifier le produit';
-        document.getElementById('productId').value = productId;
-        document.getElementById('productName').value = product.name;
-        document.getElementById('productPrice').value = product.price;
-        document.getElementById('productImage').value = product.image;
-        document.getElementById('productDescription').value = product.description;
-        document.getElementById('productCategory').value = product.category;
-    } else {
-        modalTitle.textContent = 'Ajouter un produit';
-        form.reset();
-        document.getElementById('productId').value = '';
-    }
-    
-    productModal.style.display = 'flex';
+// Modal produit
+function showAddProductModal() {
+    currentEditingProduct = null;
+    document.getElementById('modalTitle').textContent = 'Ajouter un produit';
+    document.getElementById('productForm').reset();
+    document.getElementById('pricesList').innerHTML = '';
+    addPriceRow(); // Ajouter une ligne de prix par défaut
+    document.getElementById('productModal').style.display = 'block';
 }
 
-// Fermer le modal produit
 function closeProductModal() {
-    productModal.style.display = 'none';
+    document.getElementById('productModal').style.display = 'none';
 }
 
-// Modifier un produit
-function editProduct(productId) {
-    openProductModal(productId);
+// Gestion des prix multiples
+function addPriceRow() {
+    const pricesList = document.getElementById('pricesList');
+    const priceRow = document.createElement('div');
+    priceRow.className = 'price-row';
+    priceRow.innerHTML = `
+        <input type="text" placeholder="Quantité (ex: 1 unité, 10ml)" class="quantity-input">
+        <input type="text" placeholder="Prix (ex: 29.99€)" class="price-input">
+        <button type="button" class="remove-price-btn" onclick="removePriceRow(this)">✕</button>
+    `;
+    pricesList.appendChild(priceRow);
 }
 
-// Supprimer un produit
-async function deleteProduct(productId) {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer ce produit ?')) {
-        return;
-    }
-    
+function removePriceRow(button) {
+    button.parentElement.remove();
+}
+
+// Éditer un produit
+async function editProduct(productId) {
     try {
-        const response = await fetch(`/api/admin/products/${productId}`, {
-            method: 'DELETE'
-        });
+        const response = await fetch(`/api/products/${productId}`);
+        const product = await response.json();
         
-        if (response.ok) {
-            showSuccess('Produit supprimé avec succès');
-            loadProducts();
+        currentEditingProduct = productId;
+        document.getElementById('modalTitle').textContent = 'Modifier le produit';
+        document.getElementById('productId').value = product._id;
+        document.getElementById('productName').value = product.name;
+        document.getElementById('productDescription').value = product.description;
+        document.getElementById('productImage').value = product.image;
+        document.getElementById('productVideo').value = product.video || '';
+        
+        // Charger les prix
+        const pricesList = document.getElementById('pricesList');
+        pricesList.innerHTML = '';
+        
+        if (product.prices && product.prices.length > 0) {
+            product.prices.forEach(price => {
+                const priceRow = document.createElement('div');
+                priceRow.className = 'price-row';
+                priceRow.innerHTML = `
+                    <input type="text" placeholder="Quantité" class="quantity-input" value="${price.quantity}">
+                    <input type="text" placeholder="Prix" class="price-input" value="${price.price}">
+                    <button type="button" class="remove-price-btn" onclick="removePriceRow(this)">✕</button>
+                `;
+                pricesList.appendChild(priceRow);
+            });
         } else {
-            showError('Erreur lors de la suppression');
+            addPriceRow(); // Ajouter une ligne par défaut
         }
+        
+        document.getElementById('productModal').style.display = 'block';
     } catch (error) {
-        showError('Erreur de connexion au serveur');
+        showError('Erreur lors du chargement du produit');
     }
 }
 
-// Sauvegarder un produit
-productForm.addEventListener('submit', async (e) => {
+// Sauvegarder le produit
+document.getElementById('productForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    const productId = document.getElementById('productId').value;
+    // Collecter les prix
+    const prices = [];
+    document.querySelectorAll('.price-row').forEach(row => {
+        const quantity = row.querySelector('.quantity-input').value;
+        const price = row.querySelector('.price-input').value;
+        if (quantity && price) {
+            prices.push({ quantity, price });
+        }
+    });
+    
     const productData = {
         name: document.getElementById('productName').value,
-        price: parseFloat(document.getElementById('productPrice').value),
-        image: document.getElementById('productImage').value,
         description: document.getElementById('productDescription').value,
-        category: document.getElementById('productCategory').value
+        image: document.getElementById('productImage').value,
+        video: document.getElementById('productVideo').value,
+        prices: prices
     };
     
     try {
-        const url = productId 
-            ? `/api/admin/products/${productId}`
-            : '/api/admin/products';
-        
-        const method = productId ? 'PUT' : 'POST';
+        const url = currentEditingProduct 
+            ? `/api/products/${currentEditingProduct}` 
+            : '/api/products';
+            
+        const method = currentEditingProduct ? 'PUT' : 'POST';
         
         const response = await fetch(url, {
             method: method,
@@ -408,38 +560,43 @@ productForm.addEventListener('submit', async (e) => {
         });
         
         if (response.ok) {
-            showSuccess(productId ? 'Produit modifié avec succès' : 'Produit ajouté avec succès');
+            showSuccess(currentEditingProduct ? 'Produit modifié' : 'Produit ajouté');
             closeProductModal();
             loadProducts();
         } else {
             showError('Erreur lors de l\'enregistrement');
         }
     } catch (error) {
-        showError('Erreur de connexion au serveur');
+        showError('Erreur lors de l\'enregistrement');
     }
 });
 
-// Afficher un message de succès
-function showSuccess(message) {
-    successAlert.textContent = message;
-    successAlert.style.display = 'block';
-    setTimeout(() => {
-        successAlert.style.display = 'none';
-    }, 3000);
+// Supprimer un produit
+async function deleteProduct(productId) {
+    if (!confirm('Êtes-vous sûr de vouloir supprimer ce produit ?')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/api/products/${productId}`, {
+            method: 'DELETE'
+        });
+        
+        if (response.ok) {
+            showSuccess('Produit supprimé');
+            loadProducts();
+        } else {
+            showError('Erreur lors de la suppression');
+        }
+    } catch (error) {
+        showError('Erreur lors de la suppression');
+    }
 }
 
-// Afficher un message d'erreur
-function showError(message) {
-    errorAlert.textContent = message;
-    errorAlert.style.display = 'block';
-    setTimeout(() => {
-        errorAlert.style.display = 'none';
-    }, 3000);
-}
-
-// Fermer le modal en cliquant à l'extérieur
-productModal.addEventListener('click', (e) => {
-    if (e.target === productModal) {
+// Fermer la modal en cliquant à l'extérieur
+window.onclick = function(event) {
+    const modal = document.getElementById('productModal');
+    if (event.target == modal) {
         closeProductModal();
     }
-});
+}

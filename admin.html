@@ -348,38 +348,97 @@
             margin: 10px auto;
         }
 
-        .color-input-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .color-input-group input[type="color"] {
-            width: 50px;
-            height: 50px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .social-input-group {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }
-
-        .subsection {
-            padding: 20px;
+        /* Styles pour les réseaux Canal */
+        .canal-network-item {
             background: #f5f5f7;
+            padding: 15px;
             border-radius: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
         }
 
-        .subsection-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 15px;
-            color: #1d1d1f;
+        .canal-network-item input {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .canal-network-item .emoji-input {
+            width: 60px;
+            text-align: center;
+            font-size: 20px;
+        }
+
+        .canal-network-item .remove-btn {
+            background: #ff3b30;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .canal-network-item .remove-btn:hover {
+            background: #ff5147;
+        }
+
+        /* Styles pour les prix multiples */
+        .price-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+
+        .price-row input {
+            flex: 1;
+        }
+
+        .price-row .remove-price-btn {
+            background: #ff3b30;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .price-row .remove-price-btn:hover {
+            background: #ff5147;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .tabs {
+                overflow-x: auto;
+                white-space: nowrap;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .tab {
+                min-width: 120px;
+            }
+
+            .canal-network-item {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .canal-network-item input {
+                width: 100%;
+            }
+
+            .price-row {
+                flex-direction: column;
+            }
+
+            .price-row input {
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -414,6 +473,8 @@
                 <button class="tab active" onclick="switchTab('site')">⚙️ Apparence</button>
                 <button class="tab" onclick="switchTab('social')">🌐 Réseaux Sociaux</button>
                 <button class="tab" onclick="switchTab('contact')">📝 Contact</button>
+                <button class="tab" onclick="switchTab('info')">ℹ️ Info</button>
+                <button class="tab" onclick="switchTab('canal')">📡 Canal</button>
                 <button class="tab" onclick="switchTab('products')">🛍️ Produits</button>
             </div>
 
@@ -448,7 +509,10 @@
                                 <div class="form-group">
                                     <label for="logoUrl">URL du logo PNG (transparent recommandé)</label>
                                     <input type="url" id="logoUrl" placeholder="https://exemple.com/logo.png">
-                                    <small style="color: #6e6e73;">Le logo sera affiché en blanc dans le header et en transparence sur la page</small>
+                                </div>
+                                <div class="preview-section" id="logoPreview" style="display: none;">
+                                    <p>Aperçu du logo :</p>
+                                    <img id="logoPreviewImg" class="preview-logo" alt="Aperçu du logo">
                                 </div>
                             </div>
                         </form>
@@ -456,19 +520,30 @@
 
                     <!-- Fond de la boutique -->
                     <div class="subsection">
-                        <h3 class="subsection-title">Fond de la Boutique</h3>
+                        <h3 class="subsection-title">Fond de la boutique</h3>
                         <form id="backgroundForm">
-                            <div class="form-group">
-                                <label for="backgroundImage">Image de fond (URL)</label>
-                                <input type="url" id="backgroundImage" placeholder="https://exemple.com/fond.jpg">
-                                <small style="color: #6e6e73;">Laissez vide pour utiliser une couleur unie</small>
+                            <div class="radio-group">
+                                <label>
+                                    <input type="radio" name="backgroundType" value="image" id="useImageBg" checked>
+                                    Utiliser une image
+                                </label>
+                                <label>
+                                    <input type="radio" name="backgroundType" value="color" id="useColorBg">
+                                    Utiliser une couleur
+                                </label>
                             </div>
-                            
-                            <div class="form-group">
-                                <label for="backgroundColor">Couleur de fond</label>
-                                <div class="color-input-group">
-                                    <input type="color" id="backgroundColor" value="#000000">
-                                    <input type="text" id="backgroundColorText" value="#000000" placeholder="#000000">
+
+                            <div id="imageBgSection">
+                                <div class="form-group">
+                                    <label for="backgroundImage">URL de l'image de fond</label>
+                                    <input type="url" id="backgroundImage" placeholder="https://exemple.com/fond.jpg">
+                                </div>
+                            </div>
+
+                            <div id="colorBgSection" style="display: none;">
+                                <div class="form-group">
+                                    <label for="backgroundColor">Couleur de fond</label>
+                                    <input type="color" id="backgroundColor" value="#1a1a2e">
                                 </div>
                             </div>
                         </form>
@@ -480,108 +555,99 @@
                         <form id="orderButtonForm">
                             <div class="form-group">
                                 <label for="orderButtonText">Texte du bouton</label>
-                                <input type="text" id="orderButtonText" placeholder="Commander" value="Commander">
+                                <input type="text" id="orderButtonText" placeholder="Ex: 📱 COMMANDER" value="📱 COMMANDER">
                             </div>
-                            
                             <div class="form-group">
                                 <label for="orderButtonLink">Lien du bouton</label>
-                                <input type="url" id="orderButtonLink" placeholder="https://exemple.com/commander">
+                                <input type="url" id="orderButtonLink" placeholder="https://t.me/votre_telegram">
                             </div>
-                            
                             <div class="form-group">
-                                <label for="orderButtonBgColor">Couleur de fond</label>
-                                <div class="color-input-group">
-                                    <input type="color" id="orderButtonBgColor" value="#667eea">
-                                    <input type="text" id="orderButtonBgColorText" value="#667eea">
-                                </div>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="orderButtonTextColor">Couleur du texte</label>
-                                <div class="color-input-group">
-                                    <input type="color" id="orderButtonTextColor" value="#ffffff">
-                                    <input type="text" id="orderButtonTextColorText" value="#ffffff">
-                                </div>
+                                <label for="orderButtonColor">Couleur du bouton</label>
+                                <input type="color" id="orderButtonColor" value="#667eea">
                             </div>
                         </form>
                     </div>
 
-                    <button type="button" class="btn" onclick="saveAllSiteSettings()">Enregistrer tous les paramètres d'apparence</button>
+                    <button class="btn" onclick="saveAllSiteSettings()">💾 Enregistrer tous les paramètres</button>
                 </div>
             </div>
 
-            <!-- Social Settings Tab -->
+            <!-- Social Media Tab -->
             <div class="tab-content" id="socialTab">
                 <div class="section">
-                    <h2 class="section-title">Réseaux Sociaux</h2>
-                    <p style="margin-bottom: 20px; color: #6e6e73;">Les icônes apparaîtront sur le côté droit de la boutique</p>
-                    
+                    <h2 class="section-title">Réseaux Sociaux (Header)</h2>
                     <form id="socialForm">
-                        <div class="social-input-group">
-                            <div class="form-group">
-                                <label for="telegramLink">📱 Telegram</label>
-                                <input type="url" id="telegramLink" placeholder="https://t.me/votre-canal">
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="whatsappLink">💬 WhatsApp</label>
-                                <input type="url" id="whatsappLink" placeholder="https://wa.me/votre-numero">
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="instagramLink">📷 Instagram</label>
-                                <input type="url" id="instagramLink" placeholder="https://instagram.com/votre-compte">
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="snapchatLink">👻 Snapchat</label>
-                                <input type="url" id="snapchatLink" placeholder="https://snapchat.com/add/votre-compte">
-                            </div>
+                        <div class="form-group">
+                            <label for="instagramLink">Instagram</label>
+                            <input type="url" id="instagramLink" placeholder="https://instagram.com/votrecompte">
                         </div>
-                        
-                        <button type="submit" class="btn">Enregistrer les réseaux sociaux</button>
+                        <div class="form-group">
+                            <label for="telegramLink">Telegram</label>
+                            <input type="url" id="telegramLink" placeholder="https://t.me/votrecanal">
+                        </div>
+                        <div class="form-group">
+                            <label for="snapchatLink">Snapchat</label>
+                            <input type="url" id="snapchatLink" placeholder="https://snapchat.com/add/votrecompte">
+                        </div>
+                        <button type="submit" class="btn">💾 Enregistrer</button>
                     </form>
                 </div>
             </div>
 
-            <!-- Contact Content Tab -->
+            <!-- Contact Tab -->
             <div class="tab-content" id="contactTab">
                 <div class="section">
-                    <h2 class="section-title">Modifier le contenu de la page Contact</h2>
+                    <h2 class="section-title">Page Contact</h2>
                     <form id="contactForm">
                         <div class="form-group">
-                            <label for="contactTitle">Titre de la page</label>
-                            <input type="text" id="contactTitle" required>
+                            <label for="contactTitle">Titre</label>
+                            <input type="text" id="contactTitle" placeholder="Ex: Contactez-nous" required>
                         </div>
                         <div class="form-group">
-                            <label for="contactMainText">Texte principal</label>
-                            <textarea id="contactMainText" rows="5" required></textarea>
+                            <label for="contactContent">Contenu</label>
+                            <textarea id="contactContent" rows="10" placeholder="Texte de la page contact..." required></textarea>
                         </div>
-                        <div class="form-group">
-                            <label for="contactEmail">Email de contact</label>
-                            <input type="email" id="contactEmail" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="contactResponseTime">Temps de réponse</label>
-                            <input type="text" id="contactResponseTime" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="contactAdditionalInfo">Informations supplémentaires</label>
-                            <textarea id="contactAdditionalInfo" rows="3"></textarea>
-                        </div>
-                        <button type="submit" class="btn">Enregistrer les modifications</button>
+                        <button type="submit" class="btn">💾 Enregistrer</button>
                     </form>
+                </div>
+            </div>
+
+            <!-- Info Tab -->
+            <div class="tab-content" id="infoTab">
+                <div class="section">
+                    <h2 class="section-title">Page Info</h2>
+                    <form id="infoForm">
+                        <div class="form-group">
+                            <label for="infoTitle">Titre</label>
+                            <input type="text" id="infoTitle" placeholder="Ex: Informations" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="infoContent">Contenu</label>
+                            <textarea id="infoContent" rows="10" placeholder="Texte de la page info..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn">💾 Enregistrer</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Canal Tab -->
+            <div class="tab-content" id="canalTab">
+                <div class="section">
+                    <h2 class="section-title">Page Canal - Réseaux Sociaux</h2>
+                    <div id="canalNetworks">
+                        <!-- Les réseaux seront ajoutés dynamiquement ici -->
+                    </div>
+                    <button class="btn btn-secondary" onclick="addCanalNetwork()">➕ Ajouter un réseau</button>
+                    <button class="btn" onclick="saveCanalNetworks()">💾 Enregistrer</button>
                 </div>
             </div>
 
             <!-- Products Tab -->
             <div class="tab-content" id="productsTab">
                 <div class="section">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                        <h2 class="section-title">Gestion des Produits</h2>
-                        <button class="btn" style="width: auto;" onclick="openProductModal()">+ Ajouter un produit</button>
-                    </div>
-                    <div class="product-grid" id="productGrid">
+                    <h2 class="section-title">Gestion des Produits</h2>
+                    <button class="btn btn-secondary" onclick="showAddProductModal()">➕ Ajouter un produit</button>
+                    <div class="products-grid" id="productsList">
                         <!-- Les produits seront chargés ici -->
                     </div>
                 </div>
@@ -589,13 +655,11 @@
         </div>
     </div>
 
-    <!-- Product Modal -->
+    <!-- Modal pour ajouter/éditer un produit -->
     <div class="modal" id="productModal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title" id="modalTitle">Ajouter un produit</h3>
-                <button class="close-modal" onclick="closeProductModal()">×</button>
-            </div>
+            <span class="close" onclick="closeProductModal()">&times;</span>
+            <h2 id="modalTitle">Ajouter un produit</h2>
             <form id="productForm">
                 <input type="hidden" id="productId">
                 <div class="form-group">
@@ -603,26 +667,32 @@
                     <input type="text" id="productName" required>
                 </div>
                 <div class="form-group">
-                    <label for="productPrice">Prix (€)</label>
-                    <input type="number" id="productPrice" step="0.01" required>
+                    <label for="productDescription">Description</label>
+                    <textarea id="productDescription" rows="3" required></textarea>
                 </div>
                 <div class="form-group">
                     <label for="productImage">URL de l'image</label>
                     <input type="url" id="productImage" required>
                 </div>
                 <div class="form-group">
-                    <label for="productDescription">Description</label>
-                    <textarea id="productDescription" rows="4" required></textarea>
+                    <label for="productVideo">URL de la vidéo (optionnel)</label>
+                    <input type="url" id="productVideo">
                 </div>
+                
+                <!-- Section Prix Multiples -->
                 <div class="form-group">
-                    <label for="productCategory">Catégorie</label>
-                    <input type="text" id="productCategory" required>
+                    <h3>Prix et Quantités</h3>
+                    <div id="pricesList">
+                        <!-- Les prix seront ajoutés dynamiquement ici -->
+                    </div>
+                    <button type="button" class="btn btn-secondary" onclick="addPriceRow()">➕ Ajouter un prix</button>
                 </div>
-                <button type="submit" class="btn">Enregistrer</button>
+
+                <button type="submit" class="btn">💾 Enregistrer</button>
             </form>
         </div>
     </div>
 
-    <script src="admin-enhanced.js"></script>
+    <script src="admin.js"></script>
 </body>
 </html>

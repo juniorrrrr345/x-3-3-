@@ -5,48 +5,60 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact - Boutique Premium</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        .contact-content {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 20px;
+            min-height: 400px;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .contact-text {
+            color: white;
+            font-size: 18px;
+            line-height: 1.8;
+            white-space: pre-wrap;
+        }
+
+        .contact-text a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .contact-text a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
     <!-- Header avec logo -->
     <header class="header">
         <div class="header-content">
-            <img src="logo.png" alt="Logo" class="header-logo" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%2250%22%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22 fill=%22white%22 font-size=%2224%22 font-weight=%22bold%22%3ELOGO%3C/text%3E%3C/svg%3E'">
+            <h1 class="header-title" data-site-title>Boutique Premium</h1>
         </div>
     </header>
 
     <!-- Effet de flou -->
     <div class="blur-background"></div>
-    
-    <!-- Logo transparent -->
-    <div class="logo-overlay">
-        <img src="logo.png" alt="Logo" id="logoImg">
-    </div>
 
     <!-- Contenu -->
     <div class="container">
-        <h1 class="page-title" id="contactTitle">CONTACTEZ-NOUS</h1>
-        
-        <div class="contact-content" style="text-align: center; max-width: 800px; margin: 0 auto;">
-            <p id="contactMainText" style="font-size: 18px; line-height: 1.8; margin-bottom: 30px;">
-                Bienvenue sur notre page de contact. N'hésitez pas à nous contacter pour toute question ou demande d'information.
-            </p>
-
-            <div class="info-section" style="margin-top: 40px;">
-                <h2>📧 Contact Direct</h2>
-                <p style="font-size: 20px; font-weight: 600;">
-                    <a href="mailto:contact@boutique-premium.com" id="contactEmail" style="color: inherit; text-decoration: none;">
-                        contact@boutique-premium.com
-                    </a>
-                </p>
-                <p id="contactResponseTime" style="color: #6e6e73;">
-                    Réponse sous 24h garantie
-                </p>
-            </div>
-
-            <div class="info-section" style="margin-top: 30px;">
-                <p id="contactAdditionalInfo" style="font-size: 16px; line-height: 1.6;">
-                    Nous sommes disponibles du lundi au vendredi de 9h à 18h.
-                </p>
+        <div class="contact-content">
+            <h1 class="page-title" id="contactTitle">CONTACT</h1>
+            <div class="contact-text" id="contactContent">
+                <!-- Le contenu sera chargé dynamiquement -->
             </div>
         </div>
     </div>
@@ -75,28 +87,41 @@
     </nav>
 
     <script src="app.js"></script>
+    <script src="site-config.js"></script>
     <script>
-        // Charger le contenu dynamique depuis l'API
-        document.addEventListener('DOMContentLoaded', async () => {
+        // Charger le contenu contact
+        async function loadContactContent() {
             try {
                 const response = await fetch('/api/contact-content');
-                if (response.ok) {
-                    const content = await response.json();
-                    
-                    // Mettre à jour le contenu de la page
-                    if (content.title) document.getElementById('contactTitle').textContent = content.title;
-                    if (content.mainText) document.getElementById('contactMainText').textContent = content.mainText;
-                    if (content.email) {
-                        document.getElementById('contactEmail').textContent = content.email;
-                        document.getElementById('contactEmail').href = `mailto:${content.email}`;
-                    }
-                    if (content.responseTime) document.getElementById('contactResponseTime').textContent = content.responseTime;
-                    if (content.additionalInfo) document.getElementById('contactAdditionalInfo').textContent = content.additionalInfo;
+                const data = await response.json();
+                
+                if (data.title) {
+                    document.getElementById('contactTitle').textContent = data.title;
+                }
+                
+                if (data.content) {
+                    document.getElementById('contactContent').innerHTML = data.content;
+                } else {
+                    // Contenu par défaut si rien n'est configuré
+                    document.getElementById('contactContent').innerHTML = `
+                        <p>Bienvenue sur notre page de contact. N'hésitez pas à nous contacter pour toute question ou demande d'information.</p>
+                        
+                        <h2>📧 Contact Direct</h2>
+                        <p style="font-size: 20px; font-weight: 600;">
+                            <a href="mailto:contact@boutique-premium.com">contact@boutique-premium.com</a>
+                        </p>
+                        <p style="color: rgba(255, 255, 255, 0.8);">Réponse sous 24h garantie</p>
+                        
+                        <p style="margin-top: 30px;">Nous sommes disponibles du lundi au vendredi de 9h à 18h.</p>
+                    `;
                 }
             } catch (error) {
-                console.log('Utilisation du contenu par défaut');
+                console.error('Erreur lors du chargement du contenu:', error);
             }
-        });
+        }
+        
+        // Charger le contenu au chargement de la page
+        loadContactContent();
     </script>
 </body>
 </html>
